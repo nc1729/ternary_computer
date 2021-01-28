@@ -47,8 +47,15 @@ I don't know so much about this, but you can extend boolean logic to balanced te
 ## How to run
 Pull the repository, run 'make'. Executable will be written to ./build/release. Run 'make debug' to turn debug flags on.
 The assembler is Python 3 code, and is run with the command
+
 `python triangulate.py SOURCE-FILE -o OUTPUT-FILE`
+
 If you like, use .tas extension for ternary assembly source files, and .tri for ternary machine code files.
 Once your assembly is assembled, run the computer with the command
+
 `./build/release/ternary_computer DISK0.tri DISK1.tri ...`
+
 Disk 0 should be your assembled source file; Disks 1 and up can be data files, or extra programs- access these with a MOUNT n command.
+
+### Hello world
+`./build/release/ternary_computer ./test_programs/hello_world.tri`
