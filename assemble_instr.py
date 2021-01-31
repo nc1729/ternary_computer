@@ -214,7 +214,7 @@ def SET(statement):
             num = 9 * reg1_pos + reg2_pos
             opcode = value_to_tryte(num - 4*81)
             opcode = "j" + opcode[1:]
-            return opcode
+            return [opcode]
         elif statement[2][0] == "$":
             add1 = addr_to_tryte(statement[2][:-1])
             opcode = "ma" + tryte_registers[reg1]
@@ -234,7 +234,7 @@ def SET(statement):
             num = 9 * reg1_pos + reg2_pos
             opcode = value_to_tryte(num - 4*81)
             opcode = "j" + opcode[1:]
-            return opcode
+            return [opcode]
         elif statement[2][0] == "$":
             add1 = addr_to_tryte(statement[2][:-1])
             reg1_pos = trint_register_names.find(reg1)

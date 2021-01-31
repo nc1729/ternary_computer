@@ -56,364 +56,449 @@ void CPU::execute()
 	int16_t low_3 = 9 * tern_array[6] + 3 * tern_array[7] + tern_array[8];
 	switch (first)
 	{
-	case '0':
-		// instructions 0XX - handling control flow
+		case '0':
+		// 0XX - control flow
 		switch (second)
 		{
-		case '0':
+			case '0':
+			// 00X - stopping/waiting
 			switch (third)
 			{
-			case 'M':
-				// 00M - LOAD $X, n, $Y
-				load();
-				break;
-			case 'm':
-				// 00m - SAVE $X, n, $Y
-				save();
-				break;
-			case '0':
-				// 000 - HALT
-				halt_and_catch_fire();
-				break;
+				case '0':
+					// 000 - HALT
+					halt_and_catch_fire();
+					break;
+				case 'a':
+					// 00a - NOOP
+					noop();
+					break;
+				case 'A':
+					// 00A - WAIT
+					wait();
+					break;
+				
+				default:
+					halt_and_catch_fire();
+					break;
+			}
+			break;
+
 			case 'a':
-				// 00a - NOOP
-				noop();
-				break;
-			case 'A':
-				// 00A - WAIT
-				wait();
-				break;
-			case 'b':
-				// 00b - CCMP
-				clear_compare();
-				break;
-			case 'c':
-				// 00c - CCAR
-				clear_carry();
-				break;
-			case 'd':
-				// 00d - COVF
-				clear_overflow();
-				break;
-			default:
+			// 0aX - compare flag management
+			switch (third)
+			{
+				case '0':
+					// 0a0 - CCMP
+					clear_compare();
+					break;
+				case 'A':
+					// 0aA - CCAR
+					clear_carry();
+					break;
+				case 'a':
+					// 0aa - COVF
+					clear_overflow();
+					break;
+				
+				default:
 				halt_and_catch_fire();
 				break;
 			}
 			break;
-		case 'M':
-			// 0Mn - PRI n
-			set_priority(low_3);
-			break;
-		case 'E':
-		    // 0E(M-m) - PJP
-			pop_and_jump();
-			break;
-		case 'm':
-			// 0m(M-m) - CHK 
-			check_priority();
-			break;
+
+			case 'b':
+				// 0b - PJP
+				pop_and_jump();
+				break;
+
+			case 'B':
+				// 0B - jump and store
+				jump_and_store();
+				break;
+
+			case 'c':
+				// 0c - CHK
+				check_priority();
+				break;
+
+			case 'A':
+				// 0AX - conditional jumps
+				switch (third)
+				{
+					case '0':
+						// 0A0 - JPZ $X
+						jump_if_zero();
+						break;
+
+					case 'A':
+						// 0AA - JPN $X
+						jump_if_neg();
+						break;
+
+					case 'a':
+						// 0Aa - JPP $X
+						jump_if_pos();
+						break;
+
+					default:
+						halt_and_catch_fire();
+						break;
+				}
+				break;
+
+			case 'h':
+				// 0hn - THD n
+				switch_thread(low_3);
+				break;
+
+			case 'I':
+				// 0In - PRI n
+				set_priority(low_3);
+				break;
+
+			case 'i':
+				// 0in - INT $x, n
+				set_interrupt_ptr(low_3);
+				break;
+
+			case 'j':
+				// 0j - JP $X
+				jump();
+				break;
+
+			case 'm':
+				// 0mn - MOUNT n
+				mount(low_3 + 13);
+				break;
+
+			default:
+				halt_and_catch_fire();
+				break;
+		}
+	    break;
+
 		case 'a':
-			// 0a(M-m) - JPZ $X
-			jump_if_zero();
+			// aXX - input/output
+			switch (second)
+			{
+				case '0':
+					// a0 - PRINT $X, N
+					print();
+					break;
+
+				case 'A':
+					// aAX - SHOW X
+					show_tryte(*tryte_regs[third]);
+					break;
+
+				case 'a':
+					// aaX - SHOW X
+					show_trint(*trint_regs[low_2]);
+					break;
+
+				case 'B':
+					// aBX - TELL X
+					tell_tryte(*tryte_regs[third]);
+					break;
+
+				case 'b':
+					// abX - SHOW X
+					tell_trint(*trint_regs[low_2]);
+					break;
+
+				case 'C':
+					// aCY - READ $X, Y
+					read_tryte(*tryte_regs[third]);
+					break;
+
+				case 'c':
+					// acY - READ $X, Y
+					read_trint(*trint_regs[low_2]);
+					break;
+
+				case 'D':
+					// aDX - WRITE X, $Y
+					write_tryte(*tryte_regs[third]);
+					break;
+
+				case 'd':
+					// adX - WRITE X, $Y
+					write_trint(*trint_regs[low_2]);
+					break;
+
+				case 'f':
+					// af - FILL $X, N, K
+					fill();
+					break;
+
+				case 'M':
+					// aM - LOAD $X, N, $Y
+					load();
+					break;
+
+				case 'm':
+					// am - SAVE $X, N, $Y
+					save();
+					break;
+
+				default:
+					halt_and_catch_fire();
+					break;
+
+			}
 			break;
+
 		case 'b':
-			// 0b(M-m) - JPN $X
-			jump_if_neg();
+			// bXX - stack management
+			switch (second)
+			{
+				case '0':
+					// b0X - WHERE X
+					where(*tryte_regs[third]);
+					break;
+
+				case 'A':
+					// bAX - PUSH X
+					push_tryte(*tryte_regs[third]);
+					break;
+
+				case 'a':
+					// baX - PUSH X
+					push_trint(*trint_regs[low_2]);
+					break;
+
+				case 'B':
+					// bBX - PUSH X
+					pop_tryte(*tryte_regs[third]);
+					break;
+
+				case 'b':
+					// bbX - PUSH X
+					pop_trint(*trint_regs[low_2]);
+					break;
+
+				case 'M':
+					// bMX - PUSH X
+					peek_tryte(*tryte_regs[third]);
+					break;
+
+				case 'm':
+					// bmX - PUSH X
+					peek_trint(*trint_regs[low_2]);
+					break;
+
+				default:
+					halt_and_catch_fire();
+					break;
+			}
 			break;
-		case 'c':
-			// 0c(M-m) - JPP $X
-			jump_if_pos();
-			break;
-		case 'd':
-			// 0d(M-m) - JP $X
-			jump();
-			break;
-		case 'e':
-			// 0e(M-m) - JPS $X
-			jump_and_store();
-			break;
-		case 'f':
-			// 0fn - THD n
-			switch_thread(low_3);
-			break;
-		case 'g':
-			// 0gn - INT n, $X
-			set_interrupt_ptr(low_3);
-			break;
-		default:
-			halt_and_catch_fire();
-			break;
-		}
-		break;
-	case 'A':
-		switch (second)
-		{
-		case 'M':
-			// AM(M-m) - READ $X, Y
-			read_tryte(*tryte_regs[third]);
-			break;
+
 		case 'A':
-			// AA(M-m) - WRITE X, $Y
-			write_tryte(*tryte_regs[third]);
+			// AXY - add trytes
+			// ADD X, Y
+			add_trytes(*tryte_regs[second], *tryte_regs[third]);
 			break;
-		case 'a':
-			// Aa(M-m) - WRITE X, $Y
-			write_trint(*trint_regs[low_2]);
-			break;
-		case 'm':
-			// Am(M-m) - READ X, $Y
-			read_trint(*trint_regs[low_2]);
-			
-			break;
-		default:
-			halt_and_catch_fire();
-			break;
-		}
-		break;
-	case 'B':
-		switch (second)
-		{
-		case 'A':
-			// BA(M-m) - PEEK A
-			peek_tryte(*tryte_regs[third]);
-			break;
-		case 'a':
-			// Ba(M-m) - PEEK3 A
-			peek_trint(*trint_regs[low_2]);
-			break;
+		
 		case 'B':
-			// BB(M-m) - PUSH X
-			push_tryte(*tryte_regs[third]);
+			// BXY - set tryte to tryte
+			// SET X, Y
+			set_tryte(*tryte_regs[second], *tryte_regs[third]);
 			break;
+
 		case 'C':
-			// BC(M-m) - POP X
-			pop_tryte(*tryte_regs[third]);
+			// CXY - compare tryte to tryte
+			// CMP X, Y
+			compare_trytes(*tryte_regs[second], *tryte_regs[third]);
 			break;
-		case 'c':
-			// Bc(M-m) - POP X
-			pop_trint(*trint_regs[low_2]);
-			break;
-		case 'b':
-			// Bb(M-m) - PUSH X
-			push_trint(*trint_regs[low_2]);
-			break;
-		case '0':
-			// B0n - MNT n
-			mount(low_3 + 13);
-			break;
-		case 'm':
-			// Bm(M-m) - FILL $X, n, k
-			fill();
-			break;
-		}
-		break;
-	case 'C':
-	    switch (second)
-		{
-		case '0':
-		    // C0X - WHERE X
-			where(*tryte_regs[third]);
-			break;
-		}
-		break;
-	case 'D':
-		switch (second)
-		{
-		case '0':
-			// D0(M-m) - PRINT n, $X
-			print();
-			break;
-		case 'B':
-			// DB(M-m) - SHOW Ax
-			show_tryte(*tryte_regs[third]);
-			break;
-		case 'A':
-			// DA(M-m) - TELL Ax
-			tell_tryte(*tryte_regs[third]);
-			break;
-		case 'a':
-			// Da(M-m) - TELL A
-			tell_trint(*trint_regs[low_2]);
-			break;
-		case 'b':
-			// Db(M-m) - SHOW A
-			show_trint(*trint_regs[low_2]);
-			break;
-		}
-		break;
-	case 'a':
-		// aXY - SET X, Y
-		set_tryte(*tryte_regs[second], *tryte_regs[third]);
-		break;
-	case 'b':
-		// bXY - CMP X, Y
-		compare_trytes(*tryte_regs[second], *tryte_regs[third]);
-		break;
-	case 'c':
-		// cXY - ADD X, Y
-		add_trytes(*tryte_regs[second], *tryte_regs[third]);
-		break;
-	case 'd':
-		// dXY - MUL X, Y
-		mult_trytes(*tryte_regs[second], *tryte_regs[third]);
-		break;
-	case 'e':
-		// eXY - DIV X, Y
-		div_trytes(*tryte_regs[second], *tryte_regs[third]);
-		break;
-	case 'f':
-		// fXY - AND X, Y
-		and_trytes(*tryte_regs[second], *tryte_regs[third]);
-		break;
-	case 'g':
-		// gXY - OR X, Y
-		or_trytes(*tryte_regs[second], *tryte_regs[third]);
-		break;
-	case 'h':
-		// hXY - XOR X, Y
-		xor_trytes(*tryte_regs[second], *tryte_regs[third]);
-		break;
-	case 'i':
-		// iXY - SWAP X, Y
-		swap_trytes(*tryte_regs[second], *tryte_regs[third]);
-		break;
-	case 'j':
-		// instructions jXX: instructions handling pairs of Trints
-		// convert relevant values into ints between 0 and 8 inclusive
-		switch (high_2)
-		{
-		case 0:
-			// j(M-K)(M-m) - SET3 X, Y
-			set_trint(*trint_regs[mid_2], *trint_regs[low_2]);
-			break;
-		case 1:
-			// j(J-H)(M-m) - CMP3 X, Y
-			compare_trints(*trint_regs[mid_2], *trint_regs[low_2]);
-			break;
-		case 2:
-			// j(G-E)(M-m) - ADD3 X, Y
-			add_trints(*trint_regs[mid_2], *trint_regs[low_2]);
-			break;
-		case 3:
-			// j(D-B)(M-m) - MUL3 X, Y
-			mult_trints(*trint_regs[mid_2], *trint_regs[low_2]);
-			break;
-		case 4:
-			// j(A-a)(M-m) - DIV3 X, Y
-			div_trints(*trint_regs[mid_2], *trint_regs[low_2]);
-			break;
-		case 5:
-			// j(b-d)(M-m) - AND3 X, Y
-			and_trints(*trint_regs[mid_2], *trint_regs[low_2]);
-			break;
-		case 6:
-			// j(e-g)(M-m) - OR3 X, Y
-			or_trints(*trint_regs[mid_2], *trint_regs[low_2]);
-			break;
-		case 7:
-			// j(h-j)(M-m) - XOR3 X, Y
-			xor_trints(*trint_regs[mid_2], *trint_regs[low_2]);
-			break;
-		case 8:
-			// j(k-m)(M-m) - SWAP3 X, Y
-			swap_trints(*trint_regs[mid_2], *trint_regs[low_2]);
-			break;
-		default:
-			halt_and_catch_fire();
-			break;
-		}
-		break;
-	case 'k':
-		switch (second)
-		{
-		case 'E':
-			// kE(M-m) - DEC X
-			dec_trint(*trint_regs[low_2]);
-			break;
+
 		case 'D':
-			// kD(M-m) - INC X
-			inc_trint(*trint_regs[low_2]);
+			// DXY - divide tryte by tryte
+			// DIV X, Y
+			div_trytes(*tryte_regs[second], *tryte_regs[third]);
 			break;
-		case 'C':
-			// kC(M-m) - FLIP3 X
-			flip_trint(*trint_regs[low_2]);
+
+		case 'E':
+			// EXY - multiply tryte by tryte
+			// MUL X, Y
+			mult_trytes(*tryte_regs[second], *tryte_regs[third]);
 			break;
-		case 'B':
-			// kB(M-m) - SHR3 n, X
-			shift_trint_right(*trint_regs[low_2]);
+
+		case 'f':
+			// fXY - floating point operations
 			break;
-		case 'A':
-			// kA(M-m) - SHL3 X, n
-			shift_trint_left(*trint_regs[low_2]);
+
+		case 'F':
+			// FXY - AND trytes
+			// AND X, Y
+			and_trytes(*tryte_regs[second], *tryte_regs[third]);
 			break;
-		case 'a':
-			// ka(M-m) - SHL X, n
-			shift_tryte_left(*tryte_regs[third]);
+
+		case 'G':
+			// GXY - OR trytes
+			// OR X, Y
+			or_trytes(*tryte_regs[second], *tryte_regs[third]);
 			break;
-		case 'b':
-			// kb(M-m) - SHR X, n
-			shift_tryte_right(*tryte_regs[third]);
+
+		case 'H':
+			// HXY - XOR trytes
+			// XOR X, Y
+			xor_trytes(*tryte_regs[second], *tryte_regs[third]);
 			break;
-		case 'c':
-			// kc(M-m) - FLIP X
-			flip_tryte(*tryte_regs[third]);
+
+		case 'I':
+			// IXY - swap trytes
+			// SWAP X, Y
+			swap_trytes(*tryte_regs[second], *tryte_regs[third]);
 			break;
-		case 'd':
-			// kd(M-m) - INC X
-			inc_tryte(*tryte_regs[third]);
+
+		case 'j':
+			// jXY - Trint pair operations
+			switch (high_2)
+			{
+				case 0:
+					// j(M-K)(M-m) - SET3 X, Y
+					set_trint(*trint_regs[mid_2], *trint_regs[low_2]);
+					break;
+				
+				case 1:
+					// j(J-H)(M-m) - CMP3 X, Y
+					compare_trints(*trint_regs[mid_2], *trint_regs[low_2]);
+					break;
+				
+				case 2:
+					// j(G-E)(M-m) - ADD3 X, Y
+					add_trints(*trint_regs[mid_2], *trint_regs[low_2]);
+					break;
+				
+				case 3:
+					// j(D-B)(M-m) - MUL3 X, Y
+					mult_trints(*trint_regs[mid_2], *trint_regs[low_2]);
+					break;
+				
+				case 4:
+					// j(A-a)(M-m) - DIV3 X, Y
+					div_trints(*trint_regs[mid_2], *trint_regs[low_2]);
+					break;
+				
+				case 5:
+					// j(b-d)(M-m) - AND3 X, Y
+					and_trints(*trint_regs[mid_2], *trint_regs[low_2]);
+					break;
+				
+				case 6:
+					// j(e-g)(M-m) - OR3 X, Y
+					or_trints(*trint_regs[mid_2], *trint_regs[low_2]);
+					break;
+				
+				case 7:
+					// j(h-j)(M-m) - XOR3 X, Y
+					xor_trints(*trint_regs[mid_2], *trint_regs[low_2]);
+					break;
+				
+				case 8:
+					// j(k-m)(M-m) - SWAP3 X, Y
+					swap_trints(*trint_regs[mid_2], *trint_regs[low_2]);
+					break;
+				
+				default:
+					halt_and_catch_fire();
+					break;
+			}
 			break;
-		case 'e':
-			// ke(M-m) - DEC X
-			dec_tryte(*tryte_regs[third]);
+
+		case 'k':
+			// kXY - miscellanous single Trint register
+			switch (second)
+			{
+				case '0':
+					// k0X - SET X, N
+					set_trint_to_num(*trint_regs[low_2]);
+					break;
+
+				case 'a':
+					// kaX - INC X
+					inc_trint(*trint_regs[low_2]);
+					break;
+				
+				case 'A':
+					// kAX - DEC X
+					dec_trint(*trint_regs[low_2]);
+					break;
+				
+				case 'c':
+					// kcX - NOT X
+					not_trint(*trint_regs[low_2]);
+					break;
+				
+				case 'f':
+					// kfX - FLIP X
+					flip_trint(*trint_regs[low_2]);
+					break;
+				
+				case 'M':
+					// kMX - SHL X
+					shift_trint_left(*trint_regs[low_2]);
+					break;
+				
+				case 'm':
+					// kmX - SHR X
+					shift_trint_right(*trint_regs[low_2]);
+					break;
+				
+				default:
+					halt_and_catch_fire();
+					break;
+			}
 			break;
+
+		case 'K':
+			// Kxy - Tryte register & constant
+			switch (second)
+			{
+				case '0':
+					// K0X - SET X, N
+					set_tryte_to_num(*tryte_regs[third]);
+					break;
+
+				case 'a':
+					// KaX - INC X
+					inc_tryte(*tryte_regs[third]);
+					break;
+				
+				case 'A':
+					// KAX - DEC X
+					dec_tryte(*tryte_regs[third]);
+					break;
+				
+				case 'c':
+					// KcX - NOT X
+					not_tryte(*tryte_regs[third]);
+					break;
+				
+				case 'f':
+					// KfX - FLIP X
+					flip_tryte(*tryte_regs[third]);
+					break;
+				
+				case 'M':
+					// KMX - SHL X
+					shift_tryte_left(*tryte_regs[third]);
+					break;
+				
+				case 'm':
+					// KmX - SHR X
+					shift_tryte_right(*tryte_regs[third]);
+					break;
+				
+				default:
+					halt_and_catch_fire();
+					break;
+			}
+			break;
+
 		default:
 			halt_and_catch_fire();
 			break;
-		}
-		break;
-	case 'M':
-		switch (second)
-		{
-		case 'M':
-			// MM(M-m) - NOT3 X
-			not_trint(*trint_regs[low_2]);
-			break;
-		case 'm':
-			// Mm(M-m) - NOT X
-			not_tryte(*tryte_regs[third]);
-			break;
-		default:
-			halt_and_catch_fire();
-			break;
-		}
-		break;
-	case 'm':
-		switch (second)
-		{
-		case 'B':
-			// mB(M-m) - SET3 X, n
-			set_trint_to_num(*trint_regs[low_2]);
-			break;
-		case 'A':
-			// mA(M-m) - SET3 X, $Y 
-			set_trint_to_addr(*trint_regs[low_2]);
-			break;
-		case 'a':
-			// ma(M-m) - SET X, $Y
-			set_tryte_to_addr(*tryte_regs[third]);
-			break;
-		case 'b':
-			// mb(M-m) - SET X, n
-			set_tryte_to_num(*tryte_regs[third]);
-			break;
-		default:
-			halt_and_catch_fire();
-			break;
-		}
-		break;
-	default:
-		halt_and_catch_fire();
-		break;
 	}
 }
 
