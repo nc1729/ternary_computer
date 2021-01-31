@@ -125,14 +125,14 @@ def SAVE(statement):
 
 def PRINT(statement):
     arg_number_success(statement, 2)
-    add1 = addr_to_tryte(statement[1], statement, 1)
     try:
-        int(statement[2])
-        val1 = unsigned_value_to_tryte(int(statement[2]) - 9841)
-        print(["D00", add1, val1])
-        return ["D00", add1, val1]
+        int(statement[1])
+        val1 = unsigned_value_to_tryte(int(statement[1]) - 9841)
     except ValueError:
-        raise ValueError("PRINT: Argument 2 must be an integer.")
+        raise ValueError("PRINT: Argument 1 must be an integer.")
+    add1 = addr_to_tryte(statement[2], statement, 2)
+    return ["D00", val1, add1]
+        
 
 
 def SHOW(statement):
@@ -248,7 +248,7 @@ def SET(statement):
                 print_error(statement[-1], "Argument 2 of SET statement must be a register, address or integer.")
             reg1_pos = trint_register_names.find(reg1)
             opcode_chars = "DBCA0abcd"
-            opcode = "mB" + tryte_registers[reg1]
+            opcode = "mB" + opcode_chars[reg1_pos]
             val1 = value_to_tryte(statement[2])
             return [opcode, val1]
     else:
@@ -405,15 +405,15 @@ def DIV(statement):
 
 def SHL(statement):
     arg_number_success(statement, 2)
-    opcode = reg_to_opcode(statement[1], statement, 1, "ka", "kA")
-    val1 = unsigned_value_to_tryte(statement[2])
+    val1 = unsigned_value_to_tryte(statement[1])
+    opcode = reg_to_opcode(statement[2], statement, 2, "ka", "kA")
     return [opcode, val1]
 
 
 def SHR(statement):
     arg_number_success(statement, 2)
-    opcode = reg_to_opcode(statement[1], statement, 1, "kb", "kB")
-    val1 = unsigned_value_to_tryte(statement[2])
+    val1 = unsigned_value_to_tryte(statement[1])
+    opcode = reg_to_opcode(statement[2], statement, 2, "kb", "kB")
     return [opcode, val1]
 
 

@@ -1,0 +1,10 @@
+main:
+    SET A0, 7
+    SET B0, 5
+    SET C0, 3
+    SET C1, 0
+    STRPNT "A0 = "
+    SHOW A0
+    STRPNT " B0 = "
+    SHOW B0
+end main

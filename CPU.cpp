@@ -220,7 +220,7 @@ void CPU::execute()
 		switch (second)
 		{
 		case '0':
-			// D0(M-m) - PRINT $X, n
+			// D0(M-m) - PRINT n, $X
 			print();
 			break;
 		case 'B':
@@ -339,7 +339,7 @@ void CPU::execute()
 			flip_trint(*trint_regs[low_2]);
 			break;
 		case 'B':
-			// kB(M-m) - SHR3 X, n
+			// kB(M-m) - SHR3 n, X
 			shift_trint_right(*trint_regs[low_2]);
 			break;
 		case 'A':
@@ -508,8 +508,8 @@ void CPU::save()
 }
 void CPU::print()
 {
-	Tryte& add_x = _memory[_i_ptr + 1];
-	size_t n = _memory[_i_ptr + 2].get_int() + 9841;
+	size_t n = _memory[_i_ptr + 1].get_int() + 9841;
+	Tryte& add_x = _memory[_i_ptr + 2];
 	for (size_t i = 0; i < n; i++)
 	{
 		_console << _memory[add_x + i];
@@ -523,7 +523,7 @@ void CPU::show_tryte(Tryte& a)
 }
 void CPU::show_trint(Trint<3>& a)
 {
-	_console << a[0] << a[1] << a[2];
+	_console << a;
 	_i_ptr += 1;
 }
 void CPU::tell_tryte(Tryte& a)
