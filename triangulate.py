@@ -96,9 +96,9 @@ def restore_strings(stored_strings, code):
     for line in code:
         restored_line = []
         for token in line:
-            if token == "string" + str(index):
+            if str(token)[0:6] == "string":
+                index = int(str(token)[6:])
                 restored_line.append(stored_strings[index].strip("\""))
-                index += 1
             else:
                 restored_line.append(token)
         restored_code.append(restored_line)
@@ -112,20 +112,28 @@ def remove_comments(code):
     no_comment_code = []
     for line in code:
         comment = False
-        char_list = []
-        for char in line:
-            if char == '#':
-                if comment:
-                    comment = False
-                else:
-                    comment = True
-            elif char == '\n':
-                # remove new line chars
-                pass
-            elif not comment:
-                char_list.append(char)
-        new_line = "".join(char_list)
-        no_comment_code.append(new_line)
+        block_comment = False
+        if line == "###":
+            if block_comment:
+                block_comment = False
+            else:
+                block_comment = True
+        else:
+            if not block_comment:
+                char_list = []
+                for char in line:
+                    if char == '#':
+                        if comment:
+                            comment = False
+                        else:
+                            comment = True
+                    elif char == '\n':
+                        # remove new line chars
+                        pass
+                    elif not comment:
+                        char_list.append(char)
+                new_line = "".join(char_list)
+                no_comment_code.append(new_line)
     return no_comment_code
 
 
@@ -371,16 +379,21 @@ def string_maker(linked_code):
 def triangulate(line_list):
     # remove comments and empty lines
     parsed_code = parse(line_list)
+    print(parsed_code)
     # break parsed code up into functions
     function_dict = function_dict_maker(parsed_code)
+    print(function_dict)
     # assemble each function in turn
     assembled_function_dict = dict()
     for fn in function_dict:
         assembled_function_dict[fn] = assemble_function(function_dict[fn], fn)
+    print(assembled_function_dict)
     # link functions together, handling CALL and jump instructions
     linked_code = link(assembled_function_dict)
+    print(linked_code)
     # print output as a string
     assembly_string = string_maker(linked_code)
+    print(assembly_string)
     return assembly_string
 
 if __name__ == "__main__":
