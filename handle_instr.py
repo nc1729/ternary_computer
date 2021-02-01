@@ -459,8 +459,8 @@ def SET(statement):
         elif arg_is_signed_trint_value(statement[2]):
             # SET X, n
             opcode = trint_reg_to_opcode("k0", statement[1])
-            val = signed_value_to_tryte(statement[2])
-            return [opcode, val]
+            trint_list = signed_trint_value_to_trint(statement[2])
+            return [opcode] + trint_list
         elif arg_is_addr(statement[2]):
             # SET X, $Y
             opcode = trint_reg_to_opcode("ac", statement[1])

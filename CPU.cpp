@@ -121,31 +121,6 @@ void CPU::execute()
 				check_priority();
 				break;
 
-			case 'A':
-				// 0AX - conditional jumps
-				switch (third)
-				{
-					case '0':
-						// 0A0 - JPZ $X
-						jump_if_zero();
-						break;
-
-					case 'A':
-						// 0AA - JPN $X
-						jump_if_neg();
-						break;
-
-					case 'a':
-						// 0Aa - JPP $X
-						jump_if_pos();
-						break;
-
-					default:
-						halt_and_catch_fire();
-						break;
-				}
-				break;
-
 			case 'h':
 				// 0hn - THD n
 				switch_thread(low_3);
@@ -162,8 +137,43 @@ void CPU::execute()
 				break;
 
 			case 'j':
-				// 0j - JP $X
-				jump();
+			    // 0jX - jump instructions
+				switch (third)
+				{
+					case '0':
+						// 0j0 - JPZ $X
+						jump_if_zero();
+						break;
+						
+					case 'a':
+						// 0ja - JPP $X
+						jump_if_pos();
+						break;
+
+					case 'A':
+					    // 0jA - JPN $X
+						jump_if_neg();
+						break;
+
+					case 'm':
+						// 0jm - JPS $X
+						jump_and_store();
+						break;
+
+					case 'M':
+						// 0jM - PJP
+						pop_and_jump();
+						break;
+
+					case 'j':
+						// 0jj - JP $X
+						jump();
+						break;
+
+					default:
+						halt_and_catch_fire();
+						break;
+				}
 				break;
 
 			case 'm':
@@ -268,22 +278,22 @@ void CPU::execute()
 					break;
 
 				case 'B':
-					// bBX - PUSH X
+					// bBX - POP X
 					pop_tryte(*tryte_regs[third]);
 					break;
 
 				case 'b':
-					// bbX - PUSH X
+					// bbX - POP X
 					pop_trint(*trint_regs[low_2]);
 					break;
 
 				case 'M':
-					// bMX - PUSH X
+					// bMX - PEEK X
 					peek_tryte(*tryte_regs[third]);
 					break;
 
 				case 'm':
-					// bmX - PUSH X
+					// bmX - PEEK X
 					peek_trint(*trint_regs[low_2]);
 					break;
 
@@ -436,12 +446,12 @@ void CPU::execute()
 					break;
 				
 				case 'M':
-					// kMX - SHL X
+					// kMX - SHL X, n
 					shift_trint_left(*trint_regs[low_2]);
 					break;
 				
 				case 'm':
-					// kmX - SHR X
+					// kmX - SHR X, n
 					shift_trint_right(*trint_regs[low_2]);
 					break;
 				
@@ -481,12 +491,12 @@ void CPU::execute()
 					break;
 				
 				case 'M':
-					// KMX - SHL X
+					// KMX - SHL X, n
 					shift_tryte_left(*tryte_regs[third]);
 					break;
 				
 				case 'm':
-					// KmX - SHR X
+					// KmX - SHR X, n
 					shift_tryte_right(*tryte_regs[third]);
 					break;
 				

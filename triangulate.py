@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-import assemble_instr
+import handle_instr
 
 
 def handle_inputs():
@@ -218,69 +218,74 @@ def function_dict_maker(code):
 
 def assemble_function(function_body, function_name):
     instruction_dict = {
-        "READ": assemble_instr.READ,
-        "WRITE": assemble_instr.WRITE,
-        "LOAD": assemble_instr.LOAD,
-        "SAVE": assemble_instr.SAVE,
-        "PRINT": assemble_instr.PRINT,
-        "SHOW": assemble_instr.SHOW,
-        "TELL": assemble_instr.TELL,
-        "PEEK": assemble_instr.PEEK,
-        "FILL": assemble_instr.FILL,
-        "MOUNT": assemble_instr.MOUNT,
-        "PUSH": assemble_instr.PUSH,
-        "POP": assemble_instr.POP,
-        "WHERE": assemble_instr.WHERE,
-        "SET": assemble_instr.SET,
-        "SWAP": assemble_instr.SWAP,
-        "CCMP": assemble_instr.CCMP,
-        "CCAR": assemble_instr.CCAR,
-        "COVF": assemble_instr.COVF,
-        "PRI": assemble_instr.PRI,
-        "CHK": assemble_instr.CHK,
-        "FLIP": assemble_instr.FLIP,
-        "INC": assemble_instr.INC,
-        "DEC": assemble_instr.DEC,
-        "ADD": assemble_instr.ADD,
-        "MUL": assemble_instr.MUL,
-        "DIV": assemble_instr.DIV,
-        "SHL": assemble_instr.SHL,
-        "SHR": assemble_instr.SHR,
-        "CMP": assemble_instr.CMP,
-        "AND": assemble_instr.AND,
-        "OR": assemble_instr.OR,
-        "XOR": assemble_instr.XOR,
-        "NOT": assemble_instr.NOT,
-        "NOOP": assemble_instr.NOOP,
-        "JPZ": assemble_instr.JPZ,
-        "JPN": assemble_instr.JPN,
-        "JPP": assemble_instr.JPP,
-        "JP": assemble_instr.JP,
-        "JPS": assemble_instr.JPS,
-        "PJP": assemble_instr.PJP,
-        "THD": assemble_instr.THD,
-        "INT": assemble_instr.INT,
-        "HALT": assemble_instr.HALT,
-        "WAIT": assemble_instr.WAIT,
-        "CALL": assemble_instr.CALL,
-        "STRWRT": assemble_instr.STRWRT,
-        "STRPNT": assemble_instr.STRPNT}
+        "READ": handle_instr.READ,
+        "WRITE": handle_instr.WRITE,
+        "LOAD": handle_instr.LOAD,
+        "SAVE": handle_instr.SAVE,
+        "PRINT": handle_instr.PRINT,
+        "SHOW": handle_instr.SHOW,
+        "TELL": handle_instr.TELL,
+        "PEEK": handle_instr.PEEK,
+        "FILL": handle_instr.FILL,
+        "MOUNT": handle_instr.MOUNT,
+        "PUSH": handle_instr.PUSH,
+        "POP": handle_instr.POP,
+        "WHERE": handle_instr.WHERE,
+        "SET": handle_instr.SET,
+        "SWAP": handle_instr.SWAP,
+        "CCMP": handle_instr.CCMP,
+        "CCAR": handle_instr.CCAR,
+        "COVF": handle_instr.COVF,
+        "PRI": handle_instr.PRI,
+        "CHK": handle_instr.CHK,
+        "FLIP": handle_instr.FLIP,
+        "INC": handle_instr.INC,
+        "DEC": handle_instr.DEC,
+        "ADD": handle_instr.ADD,
+        "MUL": handle_instr.MUL,
+        "DIV": handle_instr.DIV,
+        "SHL": handle_instr.SHL,
+        "SHR": handle_instr.SHR,
+        "CMP": handle_instr.CMP,
+        "AND": handle_instr.AND,
+        "OR": handle_instr.OR,
+        "XOR": handle_instr.XOR,
+        "NOT": handle_instr.NOT,
+        "NOOP": handle_instr.NOOP,
+        "JPZ": handle_instr.JPZ,
+        "JPN": handle_instr.JPN,
+        "JPP": handle_instr.JPP,
+        "JP": handle_instr.JP,
+        "JPS": handle_instr.JPS,
+        "PJP": handle_instr.PJP,
+        "THD": handle_instr.THD,
+        "SETINT": handle_instr.SETINT,
+        "HALT": handle_instr.HALT,
+        "WAIT": handle_instr.WAIT,
+        "CALL": handle_instr.CALL,
+        "STRWRT": handle_instr.STRWRT,
+        "STRPNT": handle_instr.STRPNT}
 
     assembled_fn = []
+    # assemble function
     for statement in function_body:
-        instruction = instruction_dict.get(statement[0])
-        if not instruction:
-            print_error(statement[-1],
-                        "Unrecognised instruction '{}'.".format(statement[0]))
-        else:
-            output_trytes = instruction(statement)
+        if statement[0][0] == "!":
+            output_trytes = [statement[0]]
             assembled_fn += output_trytes
+        else:
+            instruction = instruction_dict.get(statement[0])
+            if not instruction:
+                print_error(statement[-1],
+                            "Unrecognised instruction '{}'.".format(statement[0]))
+            else:
+                output_trytes = instruction(statement)
+                assembled_fn += output_trytes
         
-    # append "0E0 to each internal function - it's a pop and jump
+    # append "0E0" to each internal function - it's a pop and jump
     if function_name != "main":
         assembled_fn += ["0E0"]
     else:
-        # if we hit the end of main, we have to halt and catch fire
+        # if we hit the end of main, we have to halt
         assembled_fn += ["000"]
 
     return assembled_fn
@@ -303,7 +308,7 @@ def link(assembled_fn_dict):
             if token[0] == "$":
                 referenced_fn_name = token[1:]
                 referenced_fn_addr = fn_start_dict[referenced_fn_name]
-                referenced_fn_addr = assemble_instr.value_to_tryte(referenced_fn_addr)
+                referenced_fn_addr = handle_instr.unsigned_value_to_tryte(referenced_fn_addr)
                 token = referenced_fn_addr
                 new_assembled_fn.append(token)
             else:
@@ -311,10 +316,53 @@ def link(assembled_fn_dict):
         new_assembled_fn_dict[fn_name] = new_assembled_fn
     
     # now join functions into one big list
-    output_assm_list = []
+    assm_list = []
     for fn_name in fn_start_dict:
-        output_assm_list += new_assembled_fn_dict[fn_name]
-    return output_assm_list
+        assm_list += new_assembled_fn_dict[fn_name]
+    
+    # finally, handle labels left by jump statements
+    # first loop through list and remove !jump destination labels
+    # and store their positions (using length of new list)
+    new_assm_list = []
+    jump_label_dict = dict()
+    for symbol in assm_list:
+        if symbol[0] == "!":
+            # found a jump destination label, add it to dictionary
+            # ignore it in new list
+            jump_label_dict[symbol[1:]] = len(new_assm_list)
+        else:
+            new_assm_list.append(symbol)
+    
+    # overwrite assm_list    
+    assm_list = [symbol for symbol in new_assm_list]
+    new_assm_list = []
+    ignore_next = False
+
+    # now loop through new list and use the jump label dictionary
+    # to point jump statements to where they need to go
+    for index, symbol in enumerate(assm_list):
+        if symbol[:2] == "0j":
+            # found a jump instruction
+            if symbol[2] == "M":
+                # pop and jump doesn't have a label
+                new_assm_list.append(symbol)
+            else:
+                jump_label = assm_list[index + 1]
+                dest = jump_label_dict.get(jump_label)
+                if dest is None:
+                    print("No matching jump destination label for {}.".format(jump_label))
+                    sys.exit(1)
+                else:
+                    new_assm_list.append(symbol)
+                    new_assm_list.append(handle_instr.signed_value_to_tryte(dest))
+            ignore_next = True
+        else:
+            if ignore_next:
+                ignore_next = False
+            else:
+                new_assm_list.append(symbol)
+    
+    return new_assm_list
 
 
 def string_maker(linked_code):
@@ -330,17 +378,22 @@ if __name__ == "__main__":
 
     # remove comments and empty lines
     parsed_code = parse(input_code)
+    print(parsed_code)
     # break parsed code up into functions
     function_dict = function_dict_maker(parsed_code)
+    print(function_dict)
     # assemble these functions separately
     assembled_function_dict = dict()
     for fn in function_dict:
         assembled_function_dict[fn] = assemble_function(function_dict[fn], fn)
+    print(assembled_function_dict)
 
     # now link
     linked_code = link(assembled_function_dict)
     # make it a string
     assembly_string = string_maker(linked_code)
+
+    print(assembly_string)
 
     # then write assembly_string to output file
     with open(output_filename, 'w') as writer:
