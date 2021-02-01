@@ -368,6 +368,20 @@ def link(assembled_fn_dict):
 def string_maker(linked_code):
     return ' '.join(linked_code)
 
+def triangulate(line_list):
+    # remove comments and empty lines
+    parsed_code = parse(line_list)
+    # break parsed code up into functions
+    function_dict = function_dict_maker(parsed_code)
+    # assemble each function in turn
+    assembled_function_dict = dict()
+    for fn in function_dict:
+        assembled_function_dict[fn] = assemble_function(function_dict[fn], fn)
+    # link functions together, handling CALL and jump instructions
+    linked_code = link(assembled_function_dict)
+    # print output as a string
+    assembly_string = string_maker(linked_code)
+    return assembly_string
 
 if __name__ == "__main__":
     filenames = handle_inputs()
@@ -375,21 +389,9 @@ if __name__ == "__main__":
     output_filename = filenames[1]
     with open(input_filename) as f:
         input_code = f.readlines()
-
-    # remove comments and empty lines
-    parsed_code = parse(input_code)
-    # break parsed code up into functions
-    function_dict = function_dict_maker(parsed_code)
-    # assemble these functions separately
-    assembled_function_dict = dict()
-    for fn in function_dict:
-        assembled_function_dict[fn] = assemble_function(function_dict[fn], fn)
-
-    # now link
-    linked_code = link(assembled_function_dict)
-    # make it a string
-    assembly_string = string_maker(linked_code)
+    
+    output_code = triangulate(input_code)
 
     # then write assembly_string to output file
     with open(output_filename, 'w') as writer:
-        writer.write(assembly_string)
+        writer.write(output_code)
