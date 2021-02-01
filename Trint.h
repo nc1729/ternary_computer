@@ -497,11 +497,11 @@ public:
 	int64_t get_int() const
 	{
 		int64_t output = 0;
-		int64_t power_of_27 = 1;
+		int64_t power_of_19683 = 1;
 		for (size_t i = 0; i < n; i++)
 		{
-			output += ((*this)[n - i - 1]).get_int() * power_of_27;
-			power_of_27 *= 27;
+			output += ((*this)[n - i - 1]).get_int() * power_of_19683;
+			power_of_19683 *= 19683;
 		}
 
 		return output;

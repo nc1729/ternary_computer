@@ -333,7 +333,7 @@ def link(assembled_fn_dict):
         else:
             new_assm_list.append(symbol)
     
-    # overwrite assm_list    
+    # overwrite assm_list
     assm_list = [symbol for symbol in new_assm_list]
     new_assm_list = []
     ignore_next = False
@@ -378,22 +378,17 @@ if __name__ == "__main__":
 
     # remove comments and empty lines
     parsed_code = parse(input_code)
-    print(parsed_code)
     # break parsed code up into functions
     function_dict = function_dict_maker(parsed_code)
-    print(function_dict)
     # assemble these functions separately
     assembled_function_dict = dict()
     for fn in function_dict:
         assembled_function_dict[fn] = assemble_function(function_dict[fn], fn)
-    print(assembled_function_dict)
 
     # now link
     linked_code = link(assembled_function_dict)
     # make it a string
     assembly_string = string_maker(linked_code)
-
-    print(assembly_string)
 
     # then write assembly_string to output file
     with open(output_filename, 'w') as writer:

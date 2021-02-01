@@ -4,19 +4,21 @@ main:
     SET A, 1
     SET B, 1
     SHOW A
+    STRPNT "\n"
     SHOW B
-    SET C, 8 # only need to loop 8 times
-    SET E, 0
+    STRPNT "\n"
+    #SET C, 8 # #only need to loop 8 times
+    #SET E, 0
 
-    !loop
-        ADD A, B
-        SHOW A
-        DEC C
-        CMP C, E
-        JPZ fin
-    JP loop
+    #!loop
+    #    ADD A, B
+    #    SHOW A
+    #    DEC C
+    #    CMP C, E
+    #    JPZ fin
+    #JP loop
 
-    !fin
+    #!fin
 
     STRPNT "All done!\n"
 
