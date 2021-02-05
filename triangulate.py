@@ -110,10 +110,10 @@ def restore_strings(stored_strings, code):
 def remove_comments(code):
     # anything in lines contained in '#' chars will be ignored by assembler
     no_comment_code = []
+    block_comment = False
     for line in code:
         comment = False
-        block_comment = False
-        if line == "###":
+        if "###" in line:
             if block_comment:
                 block_comment = False
             else:
@@ -181,13 +181,28 @@ def add_line_numbers(code):
 def parse(code):
     # Turn source into list of lists of type [token, token, ..., token, line_number]
     code, stored_strings = store_strings(code)
+    print("After storing strings:")
+    print(code)
+    print(stored_strings)
     code = remove_comments(code)
+    print("After removing comments:")
+    print(code)
     code = split_lines_into_tokens(code)
+    print("After splitting lines:")
+    print(code)
     code = remove_commas(code)
+    print("After removing commas:")
+    print(code)
     code = add_line_numbers(code)
+    print("After adding line numbers:")
+    print(code)
     code = remove_empty_lines(code)
+    print("After removing empty lines:")
+    print(code)
     stored_strings = handle_special_chars(stored_strings)
     code = restore_strings(stored_strings, code)
+    print("After restoring strings:")
+    print(code)
     return code
 
 def function_dict_maker(code):

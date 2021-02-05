@@ -7,7 +7,6 @@ main:
     STRPNT "\n"
     SHOW B
     STRPNT "\n"
-    ###
     SET C, 8 # only need to loop 8 times
     SET E, 0
 
@@ -22,5 +21,4 @@ main:
     !fin
 
     STRPNT "All done!\n"
-    ###
 end main

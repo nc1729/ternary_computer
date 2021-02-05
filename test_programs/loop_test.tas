@@ -1,0 +1,7 @@
+main:
+
+  !loop
+  STRPNT "LOOK AROUND YOU"
+  JP loop
+
+end main
