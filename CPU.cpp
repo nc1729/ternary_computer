@@ -1001,7 +1001,11 @@ void CPU::jump_if_zero()
 	int16_t compare_flag = Tryte::tritwise_mult(_flags, Tryte("00000000+")).get_int();
 	if (compare_flag == 0)
 	{
-		_i_ptr = _memory[_memory[_i_ptr + 1]];
+		_i_ptr = _memory[_i_ptr + 1];
+	}
+	else
+	{
+		_i_ptr += 2;
 	}
 }
 void CPU::jump_if_neg()
@@ -1009,7 +1013,11 @@ void CPU::jump_if_neg()
 	int16_t compare_flag = Tryte::tritwise_mult(_flags, Tryte("00000000+")).get_int();
 	if (compare_flag < 0)
 	{
-		_i_ptr = _memory[_memory[_i_ptr + 1]];
+		_i_ptr = _memory[_i_ptr + 1];
+	}
+	else
+	{
+		_i_ptr += 2;
 	}
 }
 void CPU::jump_if_pos()
@@ -1017,7 +1025,11 @@ void CPU::jump_if_pos()
 	int16_t compare_flag = Tryte::tritwise_mult(_flags, Tryte("00000000+")).get_int();
 	if (compare_flag > 0)
 	{
-		_i_ptr = _memory[_memory[_i_ptr + 1]];
+		_i_ptr = _memory[_i_ptr + 1];
+	}
+	else
+	{
+		_i_ptr += 2;
 	}
 }
 void CPU::jump()

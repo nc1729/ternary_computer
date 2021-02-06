@@ -1,16 +1,28 @@
 import handle_instr
 import sys
 
+def function_length(function_body):
+    """
+    Get the length of an assembled function, disregarding jump destination tokens.
+    """
+    output = 0
+    for token in function_body:
+        if token[0] == "!":
+            pass
+        else:
+            output += 1
+    return output
+
 def build_fn_start_dict(assembled_code):
     """
     Generate a dictionary of function names and the places in the assembly where they start.
     """
     fn_start_dict = {"main": 0} # start main function at beginning of output
-    pointer = len(assembled_code["main"])
+    pointer = function_length(assembled_code["main"])
     for fn_name, fn_body in assembled_code.items():
         if fn_name != "main":
             fn_start_dict[fn_name] = pointer
-            pointer += len(fn_body)
+            pointer += function_length(fn_body)
     return fn_start_dict
 
 def handle_function_calls(assembled_code, fn_start_dict):

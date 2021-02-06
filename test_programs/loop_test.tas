@@ -1,6 +1,8 @@
 func1:
   SHOW A
+  STRPNT ","
   SHOW B
+  STRPNT "\n"
 end func1
 
 main:
