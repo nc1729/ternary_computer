@@ -18,7 +18,7 @@ int main(int argc, char** argv)
     {
         std::cout << "No disk names detected. Aborting.\n";
     }
-    else if (argv[1] == std::string("--debug"))
+    else if (argv[1] == std::string("-debug"))
     {
         debug_mode_on = true;
         if (argc == 2)

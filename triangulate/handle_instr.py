@@ -178,7 +178,7 @@ def PRI(statement):
         opcode = short_to_opcode("0I", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must satisfy 0 <= n < 27.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must satisfy 0 <= n < 27.".format(1, statement[0]))
 
 def THD(statement):
     arg_number_check(statement, 1)
@@ -186,7 +186,7 @@ def THD(statement):
         opcode = short_to_opcode("0h", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must satisfy 0 <= n < 27.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must satisfy 0 <= n < 27.".format(1, statement[0]))
 
 def MOUNT(statement):
     arg_number_check(statement, 1)
@@ -194,42 +194,43 @@ def MOUNT(statement):
         opcode = short_to_opcode("0m", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must satisfy 0 <= n < 27.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must satisfy 0 <= n < 27.".format(1, statement[0]))
 
+# Handle all jump statements at link time (except PJP)
 def JPZ(statement):
     arg_number_check(statement, 1)
     if isinstance(statement[1], str):
-        return ["0j0", statement[1]]
+        return ["JPZ", statement[1]]
     else:
-        print_error("Argument {} of {} statement must be a string.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} of {} statement must be a string.".format(1, statement[0]))
 
 def JPN(statement):
     arg_number_check(statement, 1)
     if isinstance(statement[1], str):
-        return ["0jA", statement[1]]
+        return ["JPN", statement[1]]
     else:
-        print_error("Argument {} of {} statement must be a string.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} of {} statement must be a string.".format(1, statement[0]))
 
 def JPP(statement):
     arg_number_check(statement, 1)
     if isinstance(statement[1], str):
-        return ["0ja", statement[1]]
+        return ["JPP", statement[1]]
     else:
-        print_error("Argument {} of {} statement must be a string.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} of {} statement must be a string.".format(1, statement[0]))
 
 def JP(statement):
     arg_number_check(statement, 1)
     if isinstance(statement[1], str):
-        return ["0jj", statement[1]]
+        return ["JP", statement[1]]
     else:
-        print_error("Argument {} of {} statement must be a string.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} of {} statement must be a string.".format(1, statement[0]))
 
 def JPS(statement):
     arg_number_check(statement, 1)
     if isinstance(statement[1], str):
-        return ["0jm", statement[1]]
+        return ["JPS", statement[1]]
     else:
-        print_error("Argument {} of {} statement must be a string.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} of {} statement must be a string.".format(1, statement[0]))
 
 def PEEK(statement):
     arg_number_check(statement, 1)
@@ -240,7 +241,7 @@ def PEEK(statement):
         opcode = trint_reg_to_opcode("bm", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def PUSH(statement):
     arg_number_check(statement, 1)
@@ -251,7 +252,7 @@ def PUSH(statement):
         opcode = trint_reg_to_opcode("ba", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def POP(statement):
     arg_number_check(statement, 1)
@@ -262,14 +263,15 @@ def POP(statement):
         opcode = trint_reg_to_opcode("bb", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def WHERE(statement):
     arg_number_check(statement, 1)
     if arg_is_tryte_reg(statement[1]):
         opcode = tryte_reg_to_opcode("b0", statement[1])
+        return [opcode]
     else:
-        print_error("Argument {} in {} statement must be a valid Tryte register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid Tryte register.".format(1, statement[0]))
 
 def SHOW(statement):
     arg_number_check(statement, 1)
@@ -280,7 +282,7 @@ def SHOW(statement):
         opcode = trint_reg_to_opcode("aa", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def TELL(statement):
     arg_number_check(statement, 1)
@@ -291,7 +293,7 @@ def TELL(statement):
         opcode = trint_reg_to_opcode("ab", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def INC(statement):
     arg_number_check(statement, 1)
@@ -302,7 +304,7 @@ def INC(statement):
         opcode = trint_reg_to_opcode("ka", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def DEC(statement):
     arg_number_check(statement, 1)
@@ -313,7 +315,7 @@ def DEC(statement):
         opcode = trint_reg_to_opcode("kA", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def FLIP(statement):
     arg_number_check(statement, 1)
@@ -324,7 +326,7 @@ def FLIP(statement):
         opcode = trint_reg_to_opcode("kf", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def NOT(statement):
     arg_number_check(statement, 1)
@@ -335,7 +337,7 @@ def NOT(statement):
         opcode = trint_reg_to_opcode("kc", statement[1])
         return [opcode]
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 # 2 arguments
 def SETINT(statement):
@@ -343,12 +345,12 @@ def SETINT(statement):
     if arg_is_addr(statement[1]):
         addr = statement[1][1:]
     else:
-        print_error("Argument {} in {} statement must be a valid address.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(1, statement[0]))
     
     if arg_is_short(statement[2]):
         opcode = short_to_opcode("0i", statement[2])
     else:
-        print_error("Argument {} in {} statement must be an integer satisfying 0 <= n < 27.".format(2, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= n < 27.".format(2, statement[0]))
     
     return [opcode, addr]
 
@@ -357,12 +359,12 @@ def PRINT(statement):
     if arg_is_addr(statement[1]):
         addr = statement[1][1:]
     else:
-        print_error("Argument {} in {} statement must be a valid address.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(1, statement[0]))
     
     if arg_is_unsigned_tryte_value(statement[2]):
         val = unsigned_value_to_tryte(statement[2])
     else:
-        print_error("Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     
     return ["a00", addr, val]
 
@@ -373,12 +375,12 @@ def SHL(statement):
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("kM", statement[1])
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
     
     if arg_is_signed_tryte_value(statement[2]):
         arg = signed_value_to_tryte(statement[2])
     else:
-        print_error("Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     
     return [opcode, arg]
 
@@ -389,12 +391,12 @@ def SHR(statement):
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("km", statement[1])
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
     
     if arg_is_signed_tryte_value(statement[2]):
         arg = signed_value_to_tryte(statement[2])
     else:
-        print_error("Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     
     return [opcode, arg]
 
@@ -403,13 +405,13 @@ def READ(statement):
     if arg_is_addr(statement[1]):
         addr = statement[1][1:]
     else:
-        print_error("Argument {} in {} statement must be a valid address.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(1, statement[0]))
     if arg_is_tryte_reg(statement[2]):
         opcode = tryte_reg_to_opcode("aC", statement[2])
     elif arg_is_trint_reg(statement[2]):
         opcode = trint_reg_to_opcode("ac", statement[2])
     else:
-        print_error("Argument {} in {} must be a valid register.".format(2, statement[0]))
+        print_error(statement[-1], "Argument {} in {} must be a valid register.".format(2, statement[0]))
     
     return [opcode, addr]
 
@@ -420,11 +422,11 @@ def WRITE(statement):
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("ad", statement[1])
     else:
-        print_error("Argument {} in {} must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} must be a valid register.".format(1, statement[0]))
     if arg_is_addr(statement[2]):
         addr = statement[2][1:]
     else:
-        print_error("Argument {} in {} statement must be a valid address.".format(2, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(2, statement[0]))
     
     return [opcode, addr]
 
@@ -446,7 +448,7 @@ def SET(statement):
             addr = statement[2][1:]
             return [opcode, addr]
         else:
-            print_error("Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
+            print_error(statement[-1], "Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
     elif arg_is_trint_reg(statement[1]):
         if arg_is_trint_reg(statement[2]):
             # SET X, Y
@@ -467,9 +469,9 @@ def SET(statement):
             addr = statement[2][1:]
             return [opcode, addr]
         else:
-            print_error("Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
+            print_error(statement[-1], "Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def CMP(statement):
     arg_number_check(statement, 2)
@@ -478,7 +480,7 @@ def CMP(statement):
             opcode = "B" + tryte_registers[statement[1]] + tryte_registers[statement[2]]
             return [opcode]
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     elif arg_is_trint_reg(statement[1]):
         if arg_is_trint_reg(statement[2]):
             reg1_pos = trint_register_names.find(statement[1])
@@ -487,11 +489,10 @@ def CMP(statement):
             opcode = signed_value_to_tryte(num - 3*81)
             opcode = "j" + opcode[1:]
             return [opcode]
-            pass
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def ADD(statement):
     arg_number_check(statement, 2)
@@ -500,7 +501,7 @@ def ADD(statement):
             opcode = "A" + tryte_registers[statement[1]] + tryte_registers[statement[2]]
             return [opcode]
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     elif arg_is_trint_reg(statement[1]):
         if arg_is_trint_reg(statement[2]):
             reg1_pos = trint_register_names.find(statement[1])
@@ -509,11 +510,10 @@ def ADD(statement):
             opcode = signed_value_to_tryte(num - 2*81)
             opcode = "j" + opcode[1:]
             return [opcode]
-            pass
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def DIV(statement):
     arg_number_check(statement, 2)
@@ -522,7 +522,7 @@ def DIV(statement):
             opcode = "D" + tryte_registers[statement[1]] + tryte_registers[statement[2]]
             return [opcode]
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     elif arg_is_trint_reg(statement[1]):
         if arg_is_trint_reg(statement[2]):
             reg1_pos = trint_register_names.find(statement[1])
@@ -531,11 +531,10 @@ def DIV(statement):
             opcode = signed_value_to_tryte(num - 0*81)
             opcode = "j" + opcode[1:]
             return [opcode]
-            pass
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def MUL(statement):
     arg_number_check(statement, 2)
@@ -544,7 +543,7 @@ def MUL(statement):
             opcode = "E" + tryte_registers[statement[1]] + tryte_registers[statement[2]]
             return [opcode]
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     elif arg_is_trint_reg(statement[1]):
         if arg_is_trint_reg(statement[2]):
             reg1_pos = trint_register_names.find(statement[1])
@@ -553,11 +552,10 @@ def MUL(statement):
             opcode = signed_value_to_tryte(num - 1*81)
             opcode = "j" + opcode[1:]
             return [opcode]
-            pass
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def AND(statement):
     arg_number_check(statement, 2)
@@ -566,7 +564,7 @@ def AND(statement):
             opcode = "F" + tryte_registers[statement[1]] + tryte_registers[statement[2]]
             return [opcode]
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     elif arg_is_trint_reg(statement[1]):
         if arg_is_trint_reg(statement[2]):
             reg1_pos = trint_register_names.find(statement[1])
@@ -575,11 +573,10 @@ def AND(statement):
             opcode = signed_value_to_tryte(num + 1*81)
             opcode = "j" + opcode[1:]
             return [opcode]
-            pass
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def OR(statement):
     arg_number_check(statement, 2)
@@ -588,7 +585,7 @@ def OR(statement):
             opcode = "G" + tryte_registers[statement[1]] + tryte_registers[statement[2]]
             return [opcode]
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     elif arg_is_trint_reg(statement[1]):
         if arg_is_trint_reg(statement[2]):
             reg1_pos = trint_register_names.find(statement[1])
@@ -597,11 +594,10 @@ def OR(statement):
             opcode = signed_value_to_tryte(num + 2*81)
             opcode = "j" + opcode[1:]
             return [opcode]
-            pass
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def XOR(statement):
     arg_number_check(statement, 2)
@@ -610,7 +606,7 @@ def XOR(statement):
             opcode = "H" + tryte_registers[statement[1]] + tryte_registers[statement[2]]
             return [opcode]
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     elif arg_is_trint_reg(statement[1]):
         if arg_is_trint_reg(statement[2]):
             reg1_pos = trint_register_names.find(statement[1])
@@ -619,11 +615,10 @@ def XOR(statement):
             opcode = signed_value_to_tryte(num + 3*81)
             opcode = "j" + opcode[1:]
             return [opcode]
-            pass
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 def SWAP(statement):
     arg_number_check(statement, 2)
@@ -632,7 +627,7 @@ def SWAP(statement):
             opcode = "I" + tryte_registers[statement[1]] + tryte_registers[statement[2]]
             return [opcode]
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     elif arg_is_trint_reg(statement[1]):
         if arg_is_trint_reg(statement[2]):
             reg1_pos = trint_register_names.find(statement[1])
@@ -641,11 +636,10 @@ def SWAP(statement):
             opcode = signed_value_to_tryte(num + 4*81)
             opcode = "j" + opcode[1:]
             return [opcode]
-            pass
         else:
-            print_error("Sizes of registers in {} statement must match.".format(statement[0]))
+            print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
     else:
-        print_error("Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
 # 3 arguments
 def LOAD(statement):
@@ -653,15 +647,15 @@ def LOAD(statement):
     if arg_is_addr(statement[1]):
         addr1 = statement[1][1:]
     else:
-        print_error("Argument {} in {} statement must be a valid address.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(1, statement[0]))
     if arg_is_signed_tryte_value(statement[2]):
         val = signed_value_to_tryte(statement[2])
     else:
-        print_error("Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     if arg_is_addr(statement[3]):
         addr2 = statement[3]
     else:
-        print_error("Argument {} in {} statement must be a valid address.".format(3, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(3, statement[0]))
     return ["aM0", addr1, val, addr2]
 
 def SAVE(statement):
@@ -669,15 +663,15 @@ def SAVE(statement):
     if arg_is_addr(statement[1]):
         addr1 = statement[1][1:]
     else:
-        print_error("Argument {} in {} statement must be a valid address.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(1, statement[0]))
     if arg_is_signed_tryte_value(statement[2]):
         val = signed_value_to_tryte(statement[2])
     else:
-        print_error("Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     if arg_is_addr(statement[3]):
         addr2 = statement[3]
     else:
-        print_error("Argument {} in {} statement must be a valid address.".format(3, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(3, statement[0]))
     return ["am0", addr1, val, addr2]
 
 def FILL(statement):
@@ -685,15 +679,15 @@ def FILL(statement):
     if arg_is_addr(statement[1]):
         addr1 = statement[1][1:]
     else:
-        print_error("Argument {} in {} statement must be a valid address.".format(1, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(1, statement[0]))
     if arg_is_signed_tryte_value(statement[2]):
         val1 = signed_value_to_tryte(statement[2])
     else:
-        print_error("Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     if arg_is_unsigned_tryte_value(statement[3]):
         val2 = unsigned_value_to_tryte(statement[3])
     else:
-        print_error("Argument {} in {} statement must be an integer satisfying -9841 <= x <= 9841.".format(3, statement[0]))
+        print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying -9841 <= x <= 9841.".format(3, statement[0]))
     return ["af0", addr1, val1, val2]
 
 # Assembler macros - these don't correspond to machine instructions
@@ -701,16 +695,15 @@ def FILL(statement):
 def CALL(statement):
     arg_number_check(statement, 1)
     fn_name = statement[1]
-    # convert to actual address at linking stage
-    # convert CALL $func1 to
-    # JPS $func1 = 0B0 $func1
+    # convert to actual instructions at linking stage
     # this jumps to $func1, and pushes the instruction pointer onto the stack
-    return ["0B0", "$" + fn_name]
+    return ["CALL", "$" + fn_name]
 
 def STRWRT(statement):
     arg_number_check(statement, 2)
     input_str = statement[1]
-    add1 = addr_to_tryte(statement[2], statement, 2)
+    if arg_is_addr(statement[2]):
+        add1 = statement[1][1:]
     add1_value = (729 * (septavingt_chars.find(add1[0]) - 13) 
     + 27 * (septavingt_chars.find(add1[1]) - 13) 
     + (septavingt_chars.find(add1[2]) - 13))

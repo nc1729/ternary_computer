@@ -1028,7 +1028,7 @@ void CPU::jump_and_store()
 {
 	_memory[_s_ptr] = _i_ptr;
 	_s_ptr += 1;
-	_i_ptr = _memory[_memory[_i_ptr + 1]];
+	_i_ptr = _memory[_i_ptr + 1];
 }
 void CPU::pop_and_jump()
 {
@@ -1129,10 +1129,8 @@ void CPU::dump()
 	std::cout << "\ni = ";
 	_console << _i;
 	std::cout << "\nInstruction pointer:\n";
-	std::cout << "i_ptr = " << _i_ptr;
-	std::cout << "\nFlags:\n";
-	std::cout << _flags;
-	std::cout << '\n';
+	std::cout << "i_ptr = " << _i_ptr << '\n';
+	std::cout << "Flags: " << _flags << '\n';
 }
 void CPU::set_interrupt_priority(int16_t n)
 {
