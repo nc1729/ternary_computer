@@ -1,2 +1,5 @@
 /build/*
 /__pycache__/*
+/.vscode/*
+/.pytest_cache/*
+/triangulate/__pycache__/*

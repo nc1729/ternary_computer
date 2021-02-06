@@ -1,0 +1,5 @@
+main:
+    SET A, 1000000000
+    SHOW A
+    STRPNT "\n"
+end main

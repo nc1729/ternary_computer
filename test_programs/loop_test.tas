@@ -1,0 +1,14 @@
+func1:
+  SHOW A
+  SHOW B
+end func1
+
+main:
+
+  SET A, 3
+  SET B, 9
+  JP test
+  !test
+  CALL func1
+
+end main

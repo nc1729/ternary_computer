@@ -33,13 +33,6 @@ private:
 	Trint<3> _h;
 	Trint<3> _i;
 
-	/*
-	std::map<char, Tryte&> tryte_regs = { {'M', _a0}, {'L', _a1}, {'K', _a2},
-		{'J', _b0}, {'I', _b1}, {'H', _b2}, {'G', _c0}, {'F', _c1}, {'E', _c2},
-		{'D', _d0}, {'C', _d1}, {'B', _d2}, {'A', _e0}, {'0', _e1}, {'a', _e2},
-		{'b', _f0}, {'c', _f1}, {'d', _f2}, {'e', _g0}, {'f', _g1}, {'g', _g2},
-		{'h', _h0}, {'i', _h1}, {'j', _h2}, {'k', _i0}, {'l', _i1}, {'m', _i2}};
-	*/
 	// register IDs 
 	std::map<char, Tryte*> tryte_regs = { {'M', &_a[0]}, {'L', &_a[1]}, {'K', &_a[2]},
 		{'J', &_b[0]}, {'I', &_b[1]}, {'H', &_b[2]}, {'G', &_c[0]}, {'F', &_c[1]}, {'E', &_c[2]},
@@ -314,5 +307,8 @@ public:
 	void boot();
 	void run();
 	void step();
+	bool is_on();
+	void current_instr();
+	void dump();
 	void set_interrupt_priority(int16_t n);
 };
