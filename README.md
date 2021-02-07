@@ -5,13 +5,14 @@ This project is a virtual machine that runs on ternary logic - all machine instr
 ## A brief introduction to balanced ternary
 Balanced ternary has the standard place value system, but with +, 0, - ; representing 1, 0 and -1 respectively. Counting in balanced ternary, we have: +, +-, +0, ++, +--, +-0, +-+, +0-, +00, +0+, ++-, ++0, +++, etc. Mathematical operations work as you'd expect; for example, take 23 + 12:
 
+```
 23 == +0--
-
 12 == 0++0
+      ____
+35 == ++0-
+```
 
-      ----
-
-      ++0- == 35. Carrying works as you'd think (+) + (+) = (-), carry +. Basically base 3 arithmetic, but shifted.
+Carrying works as you'd think (+) + (+) = (-), carry +. Basically base 3 arithmetic, but shifted.
 
 Subtraction is easy; just take the number you're subtracting and flip all its trits; 12 = ++, -12 = --. Then add. Multiplication and division work with the same algorithms from standard maths.
 ### Septavingtesmal representation
@@ -39,16 +40,15 @@ I don't know so much about this, but you can extend boolean logic to balanced te
 - An assembler (not quite finished) written in Python, converting more human readable instructions to ternary machine code.
 
 ## To do
-- Fix implementation of jump instructions in assembler; these should be able to be relative to source code (as in, JP 20 would mean jump to line 20, or perhaps implement labels) rather than compiled code
 - Add documentation for ternary assembly language
 - Test by writing more programs
 - Write a simple shell? Support larger disks? Upgrade console to understand ANSI colour codes?
 
 ## How to run
 Pull the repository, run 'make'. Executable will be written to ./build/release. Run 'make debug' to turn debug flags on.
-The assembler is Python 3 code, and is run with the command
+The assembler is Python 3 code (requires Python 3.6 or later), and is run with the command
 
-`python triangulate.py SOURCE-FILE -o OUTPUT-FILE`
+`python3 ./triangulate/triangulate.py SOURCE-FILE -o OUTPUT-FILE`
 
 If you like, use .tas extension for ternary assembly source files, and .tri for ternary machine code files.
 Once your assembly is assembled, run the computer with the command
@@ -57,5 +57,9 @@ Once your assembly is assembled, run the computer with the command
 
 Disk 0 should be your assembled source file; Disks 1 and up can be data files, or extra programs- access these with a MOUNT n command.
 
+## Example programs
 ### Hello world
 `./build/release/ternary_computer ./test_programs/hello_world.tri`
+
+### Fibonacci
+`./build/release/ternary_computer ./test_programs/fibonacci.tri`
