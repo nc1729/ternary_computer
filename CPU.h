@@ -192,21 +192,27 @@ private:
 	// ADD X, Y
 	// add the trytes X, Y, and store the result in X and the carry in register C0
 	void add_trytes(Tryte& x, Tryte& y);
+	void add_num_to_tryte(Tryte& x);
 	// ADD3 X, Y
 	// add the trints X and Y and store the result in X
 	void add_trints(Trint<3>& x, Trint<3>& y);
+	void add_num_to_trint(Trint<3>& x);
 	// MUL X, Y
 	// multiply the trytes X and Y and store the result in X and the carry in register C0
 	void mult_trytes(Tryte& x, Tryte& y);
+	void mult_tryte_by_num(Tryte& x);
 	// MUL3 X, Y
 	// multiply the trints X and Y and store the result in X
 	void mult_trints(Trint<3>& x, Trint<3>& y);
+	void mult_trint_by_num(Trint<3>& x);
 	// DIV X, Y
 	// multiply the trytes X and Y and store the result in X
 	void div_trytes(Tryte& x, Tryte& y);
+	void div_tryte_by_num(Tryte& x);
 	// DIV3 X, Y
 	// multiply the trints X and Y and store the result in X
 	void div_trints(Trint<3>& x, Trint<3>& y);
+	void div_trint_by_num(Trint<3>& x);
 	// SHL X, n
 	// shift the tryte X left by n trits
 	void shift_tryte_left(Tryte& x);
@@ -230,12 +236,14 @@ private:
 	// if X == Y, set compare flag to 0;
 	// if X > Y, set compare flag to +;
 	void compare_trytes(Tryte& x, Tryte& y);
+	void compare_tryte_to_num(Tryte& x);
 	// CMP3 X, Y
 	// compare X and Y:
 	// if X < Y, set compare flag to -; 
 	// if X == Y, set compare flag to 0;
 	// if X > Y, set compare flag to +;
-	void compare_trints(Trint<3> x, Trint<3> y);
+	void compare_trints(Trint<3>& x, Trint<3>& y);
+	void compare_trint_to_num(Trint<3>& x);
 
 	/*
 	logic
@@ -243,21 +251,27 @@ private:
 	// AND X, Y
 	// compute X & Y and store result in X
 	void and_trytes(Tryte& x, Tryte& y);
+	void and_tryte_by_num(Tryte& x);
 	// AND X, Y
 	// compute X & Y and store result in X
-	void and_trints(Trint<3> x, Trint<3> y);
+	void and_trints(Trint<3>& x, Trint<3>& y);
+	void and_trint_by_num(Trint<3>& x);
 	// OR X, Y
 	// compute X | Y and store result in X
 	void or_trytes(Tryte& x, Tryte& y);
+	void or_tryte_by_num(Tryte& x);
 	// OR X, Y
 	// compute X | Y and store result in X
-	void or_trints(Trint<3> x, Trint<3> y);
+	void or_trints(Trint<3>& x, Trint<3>& y);
+	void or_trint_by_num(Trint<3>& x);
 	// XOR X, Y
 	// compute X ^ Y and store result in X
 	void xor_trytes(Tryte& x, Tryte& y);
+	void xor_tryte_by_num(Tryte& x);
 	// XOR X, Y
 	// compute X ^ Y and store result in X
-	void xor_trints(Trint<3> x, Trint<3> y);
+	void xor_trints(Trint<3>& x, Trint<3>& y);
+	void xor_trint_by_num(Trint<3>& x);
 	// NOT X
 	// compute ~X and store result in X
 	void not_tryte(Tryte& x);

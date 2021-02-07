@@ -420,41 +420,62 @@ void CPU::execute()
 			// kXY - miscellanous single Trint register
 			switch (second)
 			{
-				case '0':
-					// k0X - SET X, N
+				case 'b':
+				    // kbX - SET X, N
 					set_trint_to_num(*trint_regs[low_2]);
 					break;
-
 				case 'a':
-					// kaX - INC X
+				    // kaX - ADD X, N
+					add_num_to_trint(*trint_regs[low_2]);
+					break;
+				case 'c':
+					// kcX - CMP X, N
+					compare_trint_to_num(*trint_regs[low_2]);
+					break;
+				case 'd':
+					// kdX - DIV X, N
+					div_trint_by_num(*trint_regs[low_2]);
+					break;
+				case 'e':
+					// keX - MUL X, N
+					mult_trint_by_num(*trint_regs[low_2]);
+					break;
+				case 'f':
+					// kfX - AND X, N
+					and_trint_by_num(*trint_regs[low_2]);
+					break;
+				case 'g':
+					// kgX - OR X, N
+					or_trint_by_num(*trint_regs[low_2]);
+					break;
+				case 'h':
+					// khX - XOR X, N
+					xor_trint_by_num(*trint_regs[low_2]);
+					break;
+				case 'i':
+					// kiX - INC X
 					inc_trint(*trint_regs[low_2]);
 					break;
-				
-				case 'A':
-					// kAX - DEC X
+				case 'I':
+					// kIX - DEC X
 					dec_trint(*trint_regs[low_2]);
 					break;
-				
-				case 'c':
-					// kcX - NOT X
+				case 'A':
+					// kAX - NOT X
 					not_trint(*trint_regs[low_2]);
 					break;
-				
-				case 'f':
-					// kfX - FLIP X
+				case '0':
+					// k0X - FLIP X
 					flip_trint(*trint_regs[low_2]);
 					break;
-				
-				case 'M':
-					// kMX - SHL X, n
+				case 'm':
+					// kmX - SHL X, n
 					shift_trint_left(*trint_regs[low_2]);
 					break;
-				
-				case 'm':
-					// kmX - SHR X, n
+				case 'M':
+					// kMX - SHR X, n
 					shift_trint_right(*trint_regs[low_2]);
 					break;
-				
 				default:
 					halt_and_catch_fire();
 					break;
@@ -465,38 +486,61 @@ void CPU::execute()
 			// Kxy - Tryte register & constant
 			switch (second)
 			{
-				case '0':
-					// K0X - SET X, N
+				case 'b':
+				    // KbX - SET X, N
 					set_tryte_to_num(*tryte_regs[third]);
 					break;
-
 				case 'a':
-					// KaX - INC X
+				    // KaX - ADD X, N
+					add_num_to_tryte(*tryte_regs[third]);
+					break;
+				case 'c':
+					// KcX - CMP X, N
+					compare_tryte_to_num(*tryte_regs[third]);
+					break;
+				case 'd':
+					// KdX - DIV X, N
+					div_tryte_by_num(*tryte_regs[third]);
+					break;
+				case 'e':
+					// KeX - MUL X, N
+					mult_tryte_by_num(*tryte_regs[third]);
+					break;
+				case 'f':
+					// KfX - AND X, N
+					and_tryte_by_num(*tryte_regs[third]);
+					break;
+				case 'g':
+					// KgX - OR X, N
+					or_tryte_by_num(*tryte_regs[third]);
+					break;
+				case 'h':
+					// KhX - XOR X, N
+					xor_tryte_by_num(*tryte_regs[third]);
+					break;
+				case 'i':
+					// KiX - INC X
 					inc_tryte(*tryte_regs[third]);
 					break;
-				
-				case 'A':
-					// KAX - DEC X
+				case 'I':
+					// KIX - DEC X
 					dec_tryte(*tryte_regs[third]);
 					break;
-				
-				case 'c':
-					// KcX - NOT X
+				case 'A':
+					// KAX - NOT X
 					not_tryte(*tryte_regs[third]);
 					break;
-				
-				case 'f':
-					// KfX - FLIP X
+				case '0':
+					// K0X - FLIP X
 					flip_tryte(*tryte_regs[third]);
 					break;
-				
-				case 'M':
-					// KMX - SHL X, n
+				case 'm':
+					// KmX - SHL X, n
 					shift_tryte_left(*tryte_regs[third]);
 					break;
 				
-				case 'm':
-					// KmX - SHR X, n
+				case 'M':
+					// KMX - SHR X, n
 					shift_tryte_right(*tryte_regs[third]);
 					break;
 				
@@ -844,10 +888,23 @@ void CPU::add_trytes(Tryte& x, Tryte& y)
 	}
 	_i_ptr += 1;
 }
+void CPU::add_num_to_tryte(Tryte& x)
+{
+	Tryte num = _memory[_i_ptr + 1];
+	x = Tryte::add_with_carry(x, num, Tryte("000"))[1];
+	_i_ptr += 2;
+}
 void CPU::add_trints(Trint<3>& x, Trint<3>& y)
 {
 	x += y;
 	_i_ptr += 1;
+}
+void CPU::add_num_to_trint(Trint<3>& x)
+{
+	std::array<Tryte, 3> new_trint_array = { _memory[_i_ptr + 1], _memory[_i_ptr + 2], _memory[_i_ptr + 3] };
+	Trint<3> num(new_trint_array);
+	x += num;
+	_i_ptr += 4;
 }
 void CPU::mult_trytes(Tryte& x, Tryte& y)
 {
@@ -867,10 +924,23 @@ void CPU::mult_trytes(Tryte& x, Tryte& y)
 	}
 	_i_ptr += 1;
 }
+void CPU::mult_tryte_by_num(Tryte& x)
+{
+	Tryte num = _memory[_i_ptr + 1];
+	x = Tryte::mult(x, num)[1];
+	_i_ptr += 2;
+}
 void CPU::mult_trints(Trint<3>& x, Trint<3>& y)
 {
 	x *= y;
 	_i_ptr += 1;
+}
+void CPU::mult_trint_by_num(Trint<3>& x)
+{
+	std::array<Tryte, 3> new_trint_array = { _memory[_i_ptr + 1], _memory[_i_ptr + 2], _memory[_i_ptr + 3] };
+	Trint<3> num(new_trint_array);
+	x *= num;
+	_i_ptr += 4;
 }
 void CPU::div_trytes(Tryte& x, Tryte& y)
 {
@@ -881,6 +951,15 @@ void CPU::div_trytes(Tryte& x, Tryte& y)
 	y -= 1;
 	_i_ptr += 1;
 }
+void CPU::div_tryte_by_num(Tryte& x)
+{
+	Tryte num = _memory[_i_ptr + 1];
+	num = 0;
+	x += 1;
+	x -= 1;
+	// to be implemented!
+	_i_ptr += 2;
+}
 void CPU::div_trints(Trint<3>& x, Trint<3>& y)
 {
 	// to be implemented!
@@ -889,6 +968,16 @@ void CPU::div_trints(Trint<3>& x, Trint<3>& y)
 	y += 1;
 	y -= 1;
 	_i_ptr += 1;
+}
+void CPU::div_trint_by_num(Trint<3>& x)
+{
+	std::array<Tryte, 3> new_trint_array = { _memory[_i_ptr + 1], _memory[_i_ptr + 2], _memory[_i_ptr + 3] };
+	Trint<3> num(new_trint_array);
+	num = 0;
+	x += 1;
+	x -= 1;
+	// to be implemented!
+	_i_ptr += 4;
 }
 void CPU::shift_tryte_left(Tryte& x)
 {
@@ -932,7 +1021,24 @@ void CPU::compare_trytes(Tryte& x, Tryte& y)
 	}
 	_i_ptr += 1;
 }
-void CPU::compare_trints(Trint<3> x, Trint<3> y)
+void CPU::compare_tryte_to_num(Tryte& x)
+{
+	Tryte num = _memory[_i_ptr + 1];
+	if (x < num)
+	{
+		_flags = Tryte::tritwise_mult(_flags, Tryte("++++++++0")) - 1;
+	}
+	else if (x > num)
+	{
+		_flags = Tryte::tritwise_mult(_flags, Tryte("++++++++0")) + 1;
+	}
+	else
+	{
+		_flags = Tryte::tritwise_mult(_flags, Tryte("++++++++0"));
+	}
+	_i_ptr += 2;
+}
+void CPU::compare_trints(Trint<3>& x, Trint<3>& y)
 {
 	if (x < y)
 	{
@@ -948,6 +1054,25 @@ void CPU::compare_trints(Trint<3> x, Trint<3> y)
 	}
 	_i_ptr += 1;
 }
+void CPU::compare_trint_to_num(Trint<3>& x)
+{
+	std::array<Tryte, 3> new_trint_array = { _memory[_i_ptr + 1], _memory[_i_ptr + 2], _memory[_i_ptr + 3] };
+	Trint<3> num(new_trint_array);
+
+	if (x < num)
+	{
+		_flags = Tryte::tritwise_mult(_flags, Tryte("++++++++0")) - 1;
+	}
+	else if (x > num)
+	{
+		_flags = Tryte::tritwise_mult(_flags, Tryte("++++++++0")) + 1;
+	}
+	else
+	{
+		_flags = Tryte::tritwise_mult(_flags, Tryte("++++++++0"));
+	}
+	_i_ptr += 4;
+}
 
 // logic
 void CPU::and_trytes(Tryte& x, Tryte& y)
@@ -955,30 +1080,72 @@ void CPU::and_trytes(Tryte& x, Tryte& y)
 	x &= y;
 	_i_ptr += 1;
 }
-void CPU::and_trints(Trint<3> x, Trint<3> y)
+void CPU::and_tryte_by_num(Tryte& x)
+{
+	Tryte num = _memory[_i_ptr + 1];
+	x &= num;
+	_i_ptr += 2;
+}
+void CPU::and_trints(Trint<3>& x, Trint<3>& y)
 {
 	x &= y;
 	_i_ptr += 1;
+}
+void CPU::and_trint_by_num(Trint<3>& x)
+{
+	std::array<Tryte, 3> new_trint_array = { _memory[_i_ptr + 1], _memory[_i_ptr + 2], _memory[_i_ptr + 3] };
+	Trint<3> num(new_trint_array);
+
+	x &= num;
+	_i_ptr += 4;
 }
 void CPU::or_trytes(Tryte& x, Tryte& y)
 {
 	x |= y;
 	_i_ptr += 1;
 }
-void CPU::or_trints(Trint<3> x, Trint<3> y)
+void CPU::or_tryte_by_num(Tryte& x)
+{
+	Tryte num = _memory[_i_ptr + 1];
+	x |= num;
+	_i_ptr += 2;
+}
+void CPU::or_trints(Trint<3>& x, Trint<3>& y)
 {
 	x |= y;
 	_i_ptr += 1;
+}
+void CPU::or_trint_by_num(Trint<3>& x)
+{
+	std::array<Tryte, 3> new_trint_array = { _memory[_i_ptr + 1], _memory[_i_ptr + 2], _memory[_i_ptr + 3] };
+	Trint<3> num(new_trint_array);
+
+	x |= num;
+	_i_ptr += 4;
 }
 void CPU::xor_trytes(Tryte& x, Tryte& y)
 {
 	x ^= y;
 	_i_ptr += 1;
 }
-void CPU::xor_trints(Trint<3> x, Trint<3> y)
+void CPU::xor_tryte_by_num(Tryte& x)
+{
+	Tryte num = _memory[_i_ptr + 1];
+	x ^= num;
+	_i_ptr += 2;
+}
+void CPU::xor_trints(Trint<3>& x, Trint<3>& y)
 {
 	x ^= y;
 	_i_ptr += 1;
+}
+void CPU::xor_trint_by_num(Trint<3>& x)
+{
+	std::array<Tryte, 3> new_trint_array = { _memory[_i_ptr + 1], _memory[_i_ptr + 2], _memory[_i_ptr + 3] };
+	Trint<3> num(new_trint_array);
+
+	x ^= num;
+	_i_ptr += 4;
 }
 void CPU::not_tryte(Tryte& x)
 {

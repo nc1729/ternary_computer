@@ -1,0 +1,22 @@
+main:
+    SET A, 9
+    MUL A, 13
+    SHOW A
+    CMP A, 0
+    STRPNT "\n"
+    JPP pos
+    JPN neg
+    JPZ eq
+    !pos
+    STRPNT "A > 0\n"
+    JP fin
+    !neg
+    STRPNT "A < 0\n"
+    JP fin
+    !eq
+    STRPNT "A == 0\n"
+    JP fin
+    !fin
+    STRPNT "All done!\n"
+end main
+    
