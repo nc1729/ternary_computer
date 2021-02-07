@@ -1,10 +1,26 @@
 import triangulate
 import assemble
 
-def test_add_trytes():
-    output = assemble.assemble_instr(['ADD', 'A', 'B', 14])
-    assert(output == [["jGL"], 1])
+def test_PRI():
+    possible_inputs = [str(i) for i in range(27)]
+    test_septavingt_chars = "MLKJIHGFEDCBA0abcdefghijklm"
+    possible_outputs = ["0I" + test_septavingt_chars[i] for i in range(27)]
+    for j in range(27):
+        test_output = assemble.assemble_instr(['PRI', possible_inputs[j], 3])
+        assert(test_output == [[possible_outputs[j]], 1])
 
-def test_set_trytes():
-    output = assemble.assemble_instr(['SET', 'I', '8', 10])
-    assert(output == [["k0d", "000", "000", "00h"], 4])
+def test_THD():
+    possible_inputs = [str(i) for i in range(27)]
+    test_septavingt_chars = "MLKJIHGFEDCBA0abcdefghijklm"
+    possible_outputs = ["0h" + test_septavingt_chars[i] for i in range(27)]
+    for j in range(27):
+        test_output = assemble.assemble_instr(['THD', possible_inputs[j], 3])
+        assert(test_output == [[possible_outputs[j]], 1])
+
+def test_MOUNT():
+    possible_inputs = [str(i) for i in range(27)]
+    test_septavingt_chars = "MLKJIHGFEDCBA0abcdefghijklm"
+    possible_outputs = ["0m" + test_septavingt_chars[i] for i in range(27)]
+    for j in range(27):
+        test_output = assemble.assemble_instr(['MOUNT', possible_inputs[j], 3])
+        assert(test_output == [[possible_outputs[j]], 1])

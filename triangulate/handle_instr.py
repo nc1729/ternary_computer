@@ -85,7 +85,7 @@ def trint_reg_to_opcode(opcode_start, reg):
     return opcode_start + trint_registers[reg]
 
 def short_to_opcode(opcode_start, short):
-    return opcode_start + septavingt_chars[short]
+    return opcode_start + septavingt_chars[int(short)]
 
 def signed_value_to_tryte(arg):
     output_string = ""
