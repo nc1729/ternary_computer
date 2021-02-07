@@ -298,10 +298,10 @@ def TELL(statement):
 def INC(statement):
     arg_number_check(statement, 1)
     if arg_is_tryte_reg(statement[1]):
-        opcode = tryte_reg_to_opcode("Ka", statement[1])
+        opcode = tryte_reg_to_opcode("Ki", statement[1])
         return [opcode]
     elif arg_is_trint_reg(statement[1]):
-        opcode = trint_reg_to_opcode("ka", statement[1])
+        opcode = trint_reg_to_opcode("ki", statement[1])
         return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
@@ -309,10 +309,10 @@ def INC(statement):
 def DEC(statement):
     arg_number_check(statement, 1)
     if arg_is_tryte_reg(statement[1]):
-        opcode = tryte_reg_to_opcode("KA", statement[1])
+        opcode = tryte_reg_to_opcode("KI", statement[1])
         return [opcode]
     elif arg_is_trint_reg(statement[1]):
-        opcode = trint_reg_to_opcode("kA", statement[1])
+        opcode = trint_reg_to_opcode("kI", statement[1])
         return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
