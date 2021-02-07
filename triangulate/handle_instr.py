@@ -455,7 +455,7 @@ def SET(statement):
             reg1_pos = trint_register_names.find(statement[1])
             reg2_pos = trint_register_names.find(statement[2])
             num = 9 * reg1_pos + reg2_pos
-            opcode = signed_value_to_tryte(num - 4*81)
+            opcode = signed_value_to_tryte(num - 4*81 - 40)
             opcode = "j" + opcode[1:]
             return [opcode]
         elif arg_is_signed_trint_value(statement[2]):
@@ -486,7 +486,7 @@ def CMP(statement):
             reg1_pos = trint_register_names.find(statement[1])
             reg2_pos = trint_register_names.find(statement[2])
             num = 9 * reg1_pos + reg2_pos
-            opcode = signed_value_to_tryte(num - 3*81)
+            opcode = signed_value_to_tryte(num - 3*81 - 40)
             opcode = "j" + opcode[1:]
             return [opcode]
         else:
@@ -507,7 +507,7 @@ def ADD(statement):
             reg1_pos = trint_register_names.find(statement[1])
             reg2_pos = trint_register_names.find(statement[2])
             num = 9 * reg1_pos + reg2_pos
-            opcode = signed_value_to_tryte(num - 2*81)
+            opcode = signed_value_to_tryte(num - 2*81 - 40)
             opcode = "j" + opcode[1:]
             return [opcode]
         else:
@@ -528,7 +528,7 @@ def DIV(statement):
             reg1_pos = trint_register_names.find(statement[1])
             reg2_pos = trint_register_names.find(statement[2])
             num = 9 * reg1_pos + reg2_pos
-            opcode = signed_value_to_tryte(num - 0*81)
+            opcode = signed_value_to_tryte(num - 0*81 - 40)
             opcode = "j" + opcode[1:]
             return [opcode]
         else:
@@ -549,7 +549,7 @@ def MUL(statement):
             reg1_pos = trint_register_names.find(statement[1])
             reg2_pos = trint_register_names.find(statement[2])
             num = 9 * reg1_pos + reg2_pos
-            opcode = signed_value_to_tryte(num - 1*81)
+            opcode = signed_value_to_tryte(num - 1*81 - 40)
             opcode = "j" + opcode[1:]
             return [opcode]
         else:
@@ -570,7 +570,7 @@ def AND(statement):
             reg1_pos = trint_register_names.find(statement[1])
             reg2_pos = trint_register_names.find(statement[2])
             num = 9 * reg1_pos + reg2_pos
-            opcode = signed_value_to_tryte(num + 1*81)
+            opcode = signed_value_to_tryte(num + 1*81 - 40)
             opcode = "j" + opcode[1:]
             return [opcode]
         else:
@@ -591,7 +591,7 @@ def OR(statement):
             reg1_pos = trint_register_names.find(statement[1])
             reg2_pos = trint_register_names.find(statement[2])
             num = 9 * reg1_pos + reg2_pos
-            opcode = signed_value_to_tryte(num + 2*81)
+            opcode = signed_value_to_tryte(num + 2*81 - 40)
             opcode = "j" + opcode[1:]
             return [opcode]
         else:
@@ -612,7 +612,7 @@ def XOR(statement):
             reg1_pos = trint_register_names.find(statement[1])
             reg2_pos = trint_register_names.find(statement[2])
             num = 9 * reg1_pos + reg2_pos
-            opcode = signed_value_to_tryte(num + 3*81)
+            opcode = signed_value_to_tryte(num + 3*81 - 40)
             opcode = "j" + opcode[1:]
             return [opcode]
         else:
@@ -633,7 +633,7 @@ def SWAP(statement):
             reg1_pos = trint_register_names.find(statement[1])
             reg2_pos = trint_register_names.find(statement[2])
             num = 9 * reg1_pos + reg2_pos
-            opcode = signed_value_to_tryte(num + 4*81)
+            opcode = signed_value_to_tryte(num + 4*81 - 40)
             opcode = "j" + opcode[1:]
             return [opcode]
         else:

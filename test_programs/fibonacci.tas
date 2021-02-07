@@ -3,18 +3,23 @@
 main:
     SET A, 1
     SET B, 1
+    SET C, 0
     SHOW A
     STRPNT "\n"
     SHOW B
     STRPNT "\n"
-    SET C, 8 # only need to loop 8 times
+    SET D, 20 # only need to loop 20 times
     SET E, 0
 
     !loop
         ADD A, B
         SHOW A
-        DEC C
-        CMP C, E
+        STRPNT "\n"
+        SET C, B
+        SET B, A
+        SET A, C
+        DEC D
+        CMP D, E
         JPZ fin
     JP loop
 

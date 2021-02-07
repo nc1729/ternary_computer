@@ -2,7 +2,9 @@ from error import print_error
 import handle_instr
 
 def function_dict_maker(code):
-    # Turn parsed code into a dict of functions (and error if the functions don't make sense)
+    """
+    Turn parsed code into a dict of functions (and error if the functions don't make sense)
+    """
     function_dict = dict()
     new_function_name = ""
     # find function names
@@ -34,8 +36,11 @@ def function_dict_maker(code):
     
     return function_dict
 
-
-def assemble_function(function_body, function_name):
+def assemble_instr(statement):
+    """
+    Transform a single statement into a list of Trytes, followed by the number of Trytes it
+    assembled into.
+    """
     instruction_dict = {
         "READ": handle_instr.READ,
         "WRITE": handle_instr.WRITE,
@@ -84,28 +89,29 @@ def assemble_function(function_body, function_name):
         "CALL": handle_instr.CALL,
         "STRWRT": handle_instr.STRWRT,
         "STRPNT": handle_instr.STRPNT}
+    if statement[0][0] == "!":
+            output_trytes = [statement[0]]
+            return [[statement[0]], 0]
+    else:
+        instruction = instruction_dict.get(statement[0])
+        if not instruction:
+            print_error(statement[-1],
+                        "Unrecognised instruction '{}'.".format(statement[0]))
+        output_trytes = instruction(statement)
+        return [output_trytes] + [len(output_trytes)]
 
+def assemble_function(function_body, function_name):
     assembled_fn = []
     # assemble function
     for statement in function_body:
-        if statement[0][0] == "!":
-            output_trytes = [statement[0]]
-            assembled_fn += output_trytes
-        else:
-            instruction = instruction_dict.get(statement[0])
-            if not instruction:
-                print_error(statement[-1],
-                            "Unrecognised instruction '{}'.".format(statement[0]))
-            else:
-                output_trytes = instruction(statement)
-                assembled_fn += output_trytes
+        assembled_fn.append(assemble_instr(statement))
         
     # append "0jM" to each internal function - it's a pop and jump
     if function_name != "main":
-        assembled_fn += ["0jM"]
+        assembled_fn.append([["0jM"], 1])
     else:
         # if we hit the end of main, we have to halt
-        assembled_fn += ["000"]
+        assembled_fn.append([["000"], 1])
 
     return assembled_fn
 

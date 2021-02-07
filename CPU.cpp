@@ -1107,7 +1107,6 @@ void CPU::run()
 void CPU::step()
 {
 	fetch();
-	current_instr();
 	execute();
 	_clock += 1;
 }
@@ -1115,12 +1114,9 @@ bool CPU::is_on()
 {
 	return _on;
 }
-void CPU::current_instr()
-{
-	std::cout << "Next instruction: " << _instr << '\n';
-}
 void CPU::dump()
 {
+	std::cout << "This instruction: " << _instr << '\n';
 	std::cout << "Registers:\n";
 	std::cout << "\na = ";
 	_console << _a;
@@ -1140,8 +1136,8 @@ void CPU::dump()
 	_console << _h;
 	std::cout << "\ni = ";
 	_console << _i;
-	std::cout << "\nInstruction pointer:\n";
-	std::cout << "i_ptr = " << _i_ptr << '\n';
+	std::cout << "\ni_ptr = " << _i_ptr << '\n';
+	std::cout << "\ns_ptr = " << _s_ptr << '\n';
 	std::cout << "Flags: " << _flags << '\n';
 }
 void CPU::set_interrupt_priority(int16_t n)

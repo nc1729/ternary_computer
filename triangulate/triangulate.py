@@ -60,11 +60,15 @@ def triangulate(input_code, debug_mode):
     Main assembler function. Parses, assembles and links the input text file to a string of Trytes,
     ready for the computer to read.
     """
+    if debug_mode:
+        print("Input code:")
+        print(input_code)
     parsed_code = parse_code(input_code, debug_mode)
     assembled_code = assemble_code(parsed_code, debug_mode)
     linked_code = link_code(assembled_code, debug_mode)
     assembly_string = ' '.join(linked_code)
     if debug_mode:
+        print("Output assembly:")
         print(assembly_string)
     return assembly_string
 
