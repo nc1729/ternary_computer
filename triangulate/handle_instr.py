@@ -91,7 +91,7 @@ def signed_value_to_tryte(arg):
     output_string = ""
     dividend = int(arg)
     remainder = 0
-    for i in range(3):
+    for _ in range(3):
         remainder = dividend % 27
         dividend = dividend // 27
         if (remainder > 13):
@@ -107,7 +107,7 @@ def unsigned_value_to_tryte(arg):
     output_string = ""
     dividend = int(arg) - 9841
     remainder = 0
-    for i in range(3):
+    for _ in range(3):
         remainder = dividend % 27
         dividend = dividend // 27
         if (remainder > 13):
@@ -123,7 +123,7 @@ def signed_trint_value_to_trint(arg):
     output_string = ""
     dividend = int(arg)
     remainder = 0
-    for i in range(9):
+    for _ in range(9):
         remainder = dividend % 27
         dividend = dividend // 27
         if (remainder > 13):
@@ -377,8 +377,8 @@ def SHL(statement):
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
     
-    if arg_is_signed_tryte_value(statement[2]):
-        arg = signed_value_to_tryte(statement[2])
+    if arg_is_unsigned_tryte_value(statement[2]):
+        arg = unsigned_value_to_tryte(statement[2])
     else:
         print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     
@@ -393,8 +393,8 @@ def SHR(statement):
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
     
-    if arg_is_signed_tryte_value(statement[2]):
-        arg = signed_value_to_tryte(statement[2])
+    if arg_is_unsigned_tryte_value(statement[2]):
+        arg = unsigned_value_to_tryte(statement[2])
     else:
         print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     
@@ -737,7 +737,7 @@ def LOAD(statement):
     else:
         print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     if arg_is_addr(statement[3]):
-        addr2 = statement[3]
+        addr2 = statement[3][1:]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(3, statement[0]))
     return ["aM0", addr1, val, addr2]
@@ -753,7 +753,7 @@ def SAVE(statement):
     else:
         print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     if arg_is_addr(statement[3]):
-        addr2 = statement[3]
+        addr2 = statement[3][1:]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(3, statement[0]))
     return ["am0", addr1, val, addr2]
@@ -764,12 +764,12 @@ def FILL(statement):
         addr1 = statement[1][1:]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(1, statement[0]))
-    if arg_is_signed_tryte_value(statement[2]):
+    if arg_is_unsigned_tryte_value(statement[2]):
         val1 = signed_value_to_tryte(statement[2])
     else:
         print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
-    if arg_is_unsigned_tryte_value(statement[3]):
-        val2 = unsigned_value_to_tryte(statement[3])
+    if arg_is_signed_tryte_value(statement[3]):
+        val2 = signed_value_to_tryte(statement[3])
     else:
         print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying -9841 <= x <= 9841.".format(3, statement[0]))
     return ["af0", addr1, val1, val2]
@@ -811,10 +811,10 @@ def STRWRT(statement):
     # generate list of instructions for print this string
     offset = 0
     for tryte in output_tryte_string:
-        # SET I2, n
-        output_instr_list += ["Kbm", tryte]
-        # WRITE I2, $add1+offset
-        output_instr_list += ["aDm", unsigned_value_to_tryte(add1_value + offset)]
+        # SET D2, n
+        output_instr_list += ["KbD", tryte]
+        # WRITE D2, $add1+offset
+        output_instr_list += ["aDD", unsigned_value_to_tryte(add1_value + offset)]
         offset += 1
 
     return output_instr_list
@@ -840,12 +840,12 @@ def STRPNT(statement):
         char2 = input_str[2*i + 1]
         output_tryte_string.append(signed_value_to_tryte(128*ord(char1) + ord(char2) - 9841))
     
-    # now one by one send to register I2 and SHOW them to the console
+    # now one by one send to register D2 and SHOW them to the console
     output_instr_list = []
     for tryte in output_tryte_string:
-        # SET I2, n
-        output_instr_list += ["Kbm", tryte]
-        # SHOW I2
-        output_instr_list += ["aAm"]
+        # SET D2, n
+        output_instr_list += ["KbD", tryte]
+        # SHOW D2
+        output_instr_list += ["aAD"]
     
     return output_instr_list
