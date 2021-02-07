@@ -187,7 +187,6 @@ public:
 		{
 			products[i] = this->multiply_by_tryte(other[i]);
 			products[i] = (products[i] << 3 * (n - i - 1));
-			std::cout << "products[" << i << "] = " << products[i] << '\n';
 		}
 
 		// then just sum these shifted products
