@@ -66,9 +66,9 @@ class Tryte
     /*
     tritwise shift operators
     */
-    Tryte operator<<(uint16_t const& n);
+    Tryte operator<<(uint16_t const& n) const;
     Tryte& operator<<=(uint16_t const& n);
-    Tryte operator>>(uint16_t const& n);
+    Tryte operator>>(uint16_t const& n) const;
     Tryte& operator>>=(uint16_t const& n);
 
     /*
@@ -132,6 +132,8 @@ class Tryte
     static std::array<Tryte, 2> mult(Tryte const& t1, Tryte const& t2);
     // get the absolute value of a Tryte
     static Tryte abs(Tryte const& t);
+    // get the sign of a Tryte
+    static int64_t sign(Tryte const& t);
     // divide two Trytes and store the quotient and remainder
     static std::array<Tryte, 2> div(Tryte const& t1, Tryte const& t2);
 };

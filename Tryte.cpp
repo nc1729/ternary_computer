@@ -460,7 +460,7 @@ Tryte Tryte::operator~()
    return Tryte(this_array);
 }
 
-Tryte Tryte::operator<<(uint16_t const& n)
+Tryte Tryte::operator<<(uint16_t const& n) const
 {
     // tritshift left. New values at the right of the tryte are filled with zeroes.
     std::array<int16_t, 9> this_array = this->ternary_array();
@@ -492,7 +492,7 @@ Tryte& Tryte::operator<<=(uint16_t const& n)
     *this = (*this << n);
     return *this;
 }
-Tryte Tryte::operator>>(uint16_t const& n)
+Tryte Tryte::operator>>(uint16_t const& n) const
 {
     // tritshift right. New values at the left of the tryte are filled with zeroes.
     std::array<int16_t, 9> this_array = this->ternary_array();
@@ -720,7 +720,22 @@ Tryte Tryte::abs(Tryte const& t)
 {
     return t > 0 ? t : -t;
 }
+int64_t Tryte::sign(Tryte const& t)
+{
+    if (t > 0)
+    {
+        return 1;
+    }
+    else if (t < 0)
+    {
+        return -1;
+    }
+    else
+    {
+        return 0;
+    }
+}
 std::array<Tryte, 2> Tryte::div(Tryte const& t1, Tryte const& t2)
 {
-
+    // division algorithm here...
 }
