@@ -1,6 +1,7 @@
 #include "Tryte.h"
 #include <ciso646> // for and & or in Visual Studio
 #include <cstdint> // for int16_t
+#include <cassert> // for assert
 #include <algorithm> // for std::reverse (reverse string), std::min
 #include <string> // for std::string
 #include <vector> // for std::vector
@@ -38,7 +39,8 @@ std::string Tryte::septavingt_string() const
 std::array<int16_t, 9> Tryte::ternary_array() const
 {
     std::array<int16_t, 9> output;
-    int16_t dividend = abs(this->m_tryte); // make positive for algorithm
+    // ensure dividend is positive (restore sign later)
+    int16_t dividend = this->m_tryte > 0 ? this->m_tryte : -this->m_tryte;
     int16_t remainder = 0;
 
     for (size_t i = 0; i < 9; i++)
@@ -153,7 +155,7 @@ int16_t Tryte::septavingt_string_to_int(std::string s_string)
 int16_t Tryte::truncate_int(int64_t const& n)
 {
     // make input positive; it's just easier
-    int64_t dividend = abs(n);
+    int64_t dividend = n > 0 ? n : -n;
 
     int16_t remainder = 0;
     std::vector<int16_t> values;
@@ -308,27 +310,27 @@ Tryte Tryte::operator--(int)
     return temp;
 }
 
-bool Tryte::operator==(Tryte const& other)
+bool Tryte::operator==(Tryte const& other) const
 {
     return this->m_tryte == other.m_tryte;
 }
-bool Tryte::operator!=(Tryte const& other)
+bool Tryte::operator!=(Tryte const& other) const
 {
     return this->m_tryte != other.m_tryte;
 }
-bool Tryte::operator<(Tryte const& other)
+bool Tryte::operator<(Tryte const& other) const
 {
     return this->m_tryte < other.m_tryte;
 }
-bool Tryte::operator<=(Tryte const& other)
+bool Tryte::operator<=(Tryte const& other) const
 {
     return this->m_tryte <= other.m_tryte;
 }
-bool Tryte::operator>(Tryte const& other)
+bool Tryte::operator>(Tryte const& other) const
 {
     return this->m_tryte > other.m_tryte;
 }
-bool Tryte::operator>=(Tryte const& other)
+bool Tryte::operator>=(Tryte const& other) const
 {
     return this->m_tryte >= other.m_tryte;
 }
@@ -713,4 +715,12 @@ std::array<Tryte, 2> Tryte::mult(Tryte const& t1, Tryte const& t2)
     output[1] = 729 * n[3] + 27 * n[4] + n[5];
 
     return output; 
+}
+Tryte Tryte::abs(Tryte const& t)
+{
+    return t > 0 ? t : -t;
+}
+std::array<Tryte, 2> Tryte::div(Tryte const& t1, Tryte const& t2)
+{
+
 }

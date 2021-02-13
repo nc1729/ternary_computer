@@ -45,12 +45,12 @@ class Tryte
     /*
     relational operators
     */
-    bool operator==(Tryte const& other);
-    bool operator!=(Tryte const& other);
-    bool operator<(Tryte const& other);
-    bool operator<=(Tryte const& other);
-    bool operator>(Tryte const& other);
-    bool operator>=(Tryte const& other);
+    bool operator==(Tryte const& other) const;
+    bool operator!=(Tryte const& other) const;
+    bool operator<(Tryte const& other) const;
+    bool operator<=(Tryte const& other) const;
+    bool operator>(Tryte const& other) const;
+    bool operator>=(Tryte const& other) const;
 
     /*
     tritwise logical operators
@@ -130,4 +130,8 @@ class Tryte
     static std::array<Tryte, 2> add_with_carry(Tryte const& t1, Tryte const& t2, Tryte const& carry);
     // mutliply two Trytes and keep the carry (for Trint ops)
     static std::array<Tryte, 2> mult(Tryte const& t1, Tryte const& t2);
+    // get the absolute value of a Tryte
+    static Tryte abs(Tryte const& t);
+    // divide two Trytes and store the quotient and remainder
+    static std::array<Tryte, 2> div(Tryte const& t1, Tryte const& t2);
 };

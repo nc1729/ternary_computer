@@ -461,7 +461,11 @@ void CPU::execute()
 					dec_trint(*trint_regs[low_2]);
 					break;
 				case 'A':
-					// kAX - NOT X
+					// kAX - ABS X
+					abs_trint(*trint_regs[low_2]);
+					break;
+				case 'B':
+					// kBX - NOT X
 					not_trint(*trint_regs[low_2]);
 					break;
 				case '0':
@@ -527,7 +531,11 @@ void CPU::execute()
 					dec_tryte(*tryte_regs[third]);
 					break;
 				case 'A':
-					// KAX - NOT X
+					// KAX - ABS X
+					abs_tryte(*tryte_regs[third]);
+					break;
+				case 'B':
+					// KBX - NOT X
 					not_tryte(*tryte_regs[third]);
 					break;
 				case '0':
@@ -944,38 +952,92 @@ void CPU::mult_trint_by_num(Trint<3>& x)
 }
 void CPU::div_trytes(Tryte& x, Tryte& y)
 {
-	// to be implemented!
-	x += 1;
-	x -= 1;
-	y += 1;
-	y -= 1;
+
+	if (x == 0)
+	{
+		// 0 % y = 0
+		y = 0;
+		_i_ptr += 1;
+		return;
+	}
+
+	if (y == 0)
+	{
+		// divide by zero - set overflow flag and go to next operation
+		_flags = Tryte::tritwise_mult(_flags, Tryte("mmd"));
+		_i_ptr += 1;
+		return;
+	}
+
+	std::array<Tryte, 2> temp = Tryte::div(x, y);
+	x = temp[0];
+	y = temp[1];
 	_i_ptr += 1;
 }
 void CPU::div_tryte_by_num(Tryte& x)
 {
 	Tryte num = _memory[_i_ptr + 1];
-	num = 0;
-	x += 1;
-	x -= 1;
-	// to be implemented!
+
+	if (x == 0)
+	{
+		_i_ptr += 1;
+		return;
+	}
+
+	if (num == 0)
+	{
+		// divide by zero - set overflow flag and go to next operation
+		_flags = Tryte::tritwise_mult(_flags, Tryte("mmd"));
+		_flags += 9;
+		_i_ptr += 1;
+		return;
+	}
+
+	std::array<Tryte, 2> temp = Tryte::div(x, num);
+	x = temp[0];
 	_i_ptr += 2;
 }
 void CPU::div_trints(Trint<3>& x, Trint<3>& y)
 {
-	// to be implemented!
-	x += 1;
-	x -= 1;
-	y += 1;
-	y -= 1;
+	if (x == 0)
+	{
+		// 0 % y = 0
+		y = 0;
+		_i_ptr += 1;
+		return;
+	}
+
+	if (y == 0)
+	{
+		// divide by zero - set overflow flag and go to next operation
+		_flags = Tryte::tritwise_mult(_flags, Tryte("mmd"));
+		_i_ptr += 1;
+		return;
+	}
+	
+	std::array<Trint<3>, 2> temp = Trint<3>::div(x, y);
+	x = temp[0];
+	y = temp[1];
 	_i_ptr += 1;
 }
 void CPU::div_trint_by_num(Trint<3>& x)
 {
 	std::array<Tryte, 3> new_trint_array = { _memory[_i_ptr + 1], _memory[_i_ptr + 2], _memory[_i_ptr + 3] };
 	Trint<3> num(new_trint_array);
-	num = 0;
-	x += 1;
-	x -= 1;
+	if (x == 0)
+	{
+		_i_ptr += 1;
+		return;
+	}
+	if (num == 0)
+	{
+		// divide by zero - set overflow flag and go to next operation
+		_flags = Tryte::tritwise_mult(_flags, Tryte("mmd"));
+		_i_ptr += 1;
+		return;
+	}
+	std::array<Trint<3>, 2> temp = Trint<3>::div(x, num);
+	x = temp[0];
 	// to be implemented!
 	_i_ptr += 4;
 }
@@ -1146,6 +1208,16 @@ void CPU::xor_trint_by_num(Trint<3>& x)
 
 	x ^= num;
 	_i_ptr += 4;
+}
+void CPU::abs_tryte(Tryte& x)
+{
+	x = Tryte::abs(x);
+	_i_ptr += 1;
+}
+void CPU::abs_trint(Trint<3>& x)
+{
+	x = Trint<3>::abs(x);
+	_i_ptr += 1;
 }
 void CPU::not_tryte(Tryte& x)
 {

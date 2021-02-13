@@ -328,13 +328,24 @@ def FLIP(statement):
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
+def ABS(statement):
+    arg_number_check(statement, 1)
+    if arg_is_tryte_reg(statement[1]):
+        opcode = tryte_reg_to_opcode("KA", statement[1])
+        return [opcode]
+    elif arg_is_trint_reg(statement[1]):
+        opcode = trint_reg_to_opcode("kA", statement[1])
+        return [opcode]
+    else:
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+
 def NOT(statement):
     arg_number_check(statement, 1)
     if arg_is_tryte_reg(statement[1]):
-        opcode = tryte_reg_to_opcode("Kc", statement[1])
+        opcode = tryte_reg_to_opcode("KB", statement[1])
         return [opcode]
     elif arg_is_trint_reg(statement[1]):
-        opcode = trint_reg_to_opcode("kc", statement[1])
+        opcode = trint_reg_to_opcode("kB", statement[1])
         return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))

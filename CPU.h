@@ -101,7 +101,7 @@ private:
 	void show_tryte(Tryte& a);
 	void show_trint(Trint<3>& a);
 	// TELL A
-	// Fill a Tryte/Trint register value with some chars
+	// Fill a Tryte/Trint register value with some chars from the console
 	void tell_tryte(Tryte& a);
 	void tell_trint(Trint<3>& a);
 	// PEEK A
@@ -129,17 +129,17 @@ private:
 	/*
 	register handling
 	*/
-	// SET3 A, $X or n or Y)
-	// set Trint register A to contents of address {X, X+1, X+2} (or number n, or register Y)
-	void set_trint_to_num(Trint<3>& a);
-	void set_trint_to_addr(Trint<3>& a);
-	void set_trint(Trint<3>& a, Trint<3>& y);
 	// SET Ax, ($X, n, Y)
 	// set Tryte register Ax to contents of address X (or number n, or register Y).
 	// wide numbers/registers will be truncated.
 	void set_tryte_to_num(Tryte& a);
 	void set_tryte_to_addr(Tryte& a);
 	void set_tryte(Tryte& a, Tryte& y);
+	// SET A, $X or n or Y)
+	// set Trint register A to contents of address {X, X+1, X+2} (or number n, or register Y)
+	void set_trint_to_num(Trint<3>& a);
+	void set_trint_to_addr(Trint<3>& a);
+	void set_trint(Trint<3>& a, Trint<3>& y);
 	// SWAP3 A, B
 	// swap Trint registers A and B
 	void swap_trints(Trint<3>& a, Trint<3>& b);
@@ -174,26 +174,26 @@ private:
 	// FLIP X
 	// Flip the sign of the contents of register X
 	void flip_tryte(Tryte& x);
-	// FLIP3 X
+	// FLIP X
 	// Flip the sign of the contents of register X
 	void flip_trint(Trint<3>& x);
 	// INC X
 	// add 1 to register X
 	void inc_tryte(Tryte& x);
-	// INC3 X
+	// INC X
 	// add 1 to trint register X
 	void inc_trint(Trint<3>& x);
 	// DEC X
 	// subtract 1 from register X
 	void dec_tryte(Tryte& x);
-	// DEC3 X
+	// DEC X
 	// subtract 1 from trint register X
 	void dec_trint(Trint<3>& x);
 	// ADD X, Y
 	// add the trytes X, Y, and store the result in X and the carry in register C0
 	void add_trytes(Tryte& x, Tryte& y);
 	void add_num_to_tryte(Tryte& x);
-	// ADD3 X, Y
+	// ADD X, Y
 	// add the trints X and Y and store the result in X
 	void add_trints(Trint<3>& x, Trint<3>& y);
 	void add_num_to_trint(Trint<3>& x);
@@ -201,7 +201,7 @@ private:
 	// multiply the trytes X and Y and store the result in X and the carry in register C0
 	void mult_trytes(Tryte& x, Tryte& y);
 	void mult_tryte_by_num(Tryte& x);
-	// MUL3 X, Y
+	// MUL X, Y
 	// multiply the trints X and Y and store the result in X
 	void mult_trints(Trint<3>& x, Trint<3>& y);
 	void mult_trint_by_num(Trint<3>& x);
@@ -209,20 +209,20 @@ private:
 	// multiply the trytes X and Y and store the result in X
 	void div_trytes(Tryte& x, Tryte& y);
 	void div_tryte_by_num(Tryte& x);
-	// DIV3 X, Y
+	// DIV X, Y
 	// multiply the trints X and Y and store the result in X
 	void div_trints(Trint<3>& x, Trint<3>& y);
 	void div_trint_by_num(Trint<3>& x);
 	// SHL X, n
 	// shift the tryte X left by n trits
 	void shift_tryte_left(Tryte& x);
-	// SHL3 X, n
+	// SHL X, n
 	// shift the trint X left by n trits
 	void shift_trint_left(Trint<3>& x);
 	// SHR X, n
 	// shift the tryte X right by n trits
 	void shift_tryte_right(Tryte& x);
-	// SHR3 X, n
+	// SHR X, n
 	// shift the trint X right by n trits
 	void shift_trint_right(Trint<3>& x);
 	
@@ -272,11 +272,13 @@ private:
 	// compute X ^ Y and store result in X
 	void xor_trints(Trint<3>& x, Trint<3>& y);
 	void xor_trint_by_num(Trint<3>& x);
+	// ABS X
+	// if negative, flip sign of X, else do nothing
+	void abs_tryte(Tryte& x);
+	void abs_trint(Trint<3>& x);
 	// NOT X
 	// compute ~X and store result in X
 	void not_tryte(Tryte& x);
-	// NOT X
-	// compute ~X and store result in X
 	void not_trint(Trint<3>& x);
 
 	/*

@@ -493,6 +493,17 @@ public:
 		return output_trint + carry_trint;
 	}
 
+	static Trint<n> abs(Trint<n> const& x)
+	{
+		return x > 0 ? x : -x;
+	} 
+
+	static std::array<Trint<n>, 2> div(Trint<n> const& x, Trint<n> const& y)
+	{
+		std::array<Trint<n>, 2> output = {0, 0};
+		return output;
+	}
+
 	int64_t get_int() const
 	{
 		int64_t output = 0;
