@@ -45,11 +45,11 @@ void CPU::fetch()
 
 void CPU::execute()
 {
-	std::string instruction = _instr.septavingt_string();
+	std::string instruction = Tryte::septavingt_string(_instr);
 	char first = instruction[0];
 	char second = instruction[1];
 	char third = instruction[2];
-	std::array<int16_t, 9> tern_array = _instr.ternary_array();
+	std::array<int16_t, 9> tern_array = Tryte::ternary_array(_instr);
 	int16_t high_2 = 3 * tern_array[3] + tern_array[4] + 4;
 	int16_t mid_2 = 3 * tern_array[5] + tern_array[6] + 4;
 	int16_t low_2 = 3 * tern_array[7] + tern_array[8] + 4;
@@ -599,8 +599,8 @@ void CPU::write_trint(Trint<3>& x)
 void CPU::load()
 {
 	// disk address is converted from Tryte to an int between 0 and 19682
-	int16_t disk_add_x = _memory[_i_ptr + 1].get_int() + 9841;
-	int16_t n = _memory[_i_ptr + 2].get_int();
+	int16_t disk_add_x = Tryte::get_int(_memory[_i_ptr + 1]) + 9841;
+	int16_t n = Tryte::get_int(_memory[_i_ptr + 2]);
 	Tryte& add_y = _memory[_i_ptr + 3];
 
 	Tryte temp;
@@ -628,8 +628,8 @@ void CPU::load()
 void CPU::save()
 {
 	Tryte& add_x = _memory[_i_ptr + 1];
-	size_t n = _memory[_i_ptr + 2].get_int() + 9841;
-	int16_t disk_add_y = _memory[_i_ptr + 3].get_int() + 9841;
+	size_t n = Tryte::get_int(_memory[_i_ptr + 2]) + 9841;
+	int16_t disk_add_y = Tryte::get_int(_memory[_i_ptr + 3]) + 9841;
 
 	std::string diskname = _disknames[_disk_num];
 	std::fstream disk(diskname);
@@ -655,7 +655,7 @@ void CPU::save()
 }
 void CPU::print()
 {
-	size_t n = _memory[_i_ptr + 1].get_int() + 9841;
+	size_t n = Tryte::get_int(_memory[_i_ptr + 1]) + 9841;
 	Tryte& add_x = _memory[_i_ptr + 2];
 	for (size_t i = 0; i < n; i++)
 	{
@@ -706,7 +706,7 @@ void CPU::peek_trint(Trint<3>& a)
 void CPU::fill()
 {
 	Tryte& add_x = _memory[_i_ptr + 1];
-	size_t n = _memory[_i_ptr + 2].get_int() + 9841;
+	size_t n = Tryte::get_int(_memory[_i_ptr + 2]) + 9841;
 	Tryte k = _memory[_i_ptr + 3];
 	for (size_t i = 0; i < n; i++)
 	{
@@ -835,8 +835,8 @@ void CPU::set_priority(int16_t n)
 }
 void CPU::check_priority()
 {
-	int16_t stored_priority = (_flags >> 6).get_int();
-	int16_t current_priority = (Tryte::tritwise_mult(_flags, Tryte("000+++000")) >> 3).get_int();
+	int16_t stored_priority = Tryte::get_int((_flags >> 6));
+	int16_t current_priority = Tryte::get_int(Tryte::tritwise_mult(_flags, Tryte("000+++000")) >> 3);
 	if (stored_priority > current_priority)
 	{
 		switch_thread(stored_priority);
@@ -952,116 +952,95 @@ void CPU::mult_trint_by_num(Trint<3>& x)
 }
 void CPU::div_trytes(Tryte& x, Tryte& y)
 {
-
-	if (x == 0)
+	try
 	{
-		// 0 % y = 0
-		y = 0;
+		std::array<Tryte, 2> div_result = Tryte::div(x, y);
+		x = div_result[0];
+		y = div_result[1];
 		_i_ptr += 1;
-		return;
 	}
-
-	if (y == 0)
-	{
-		// divide by zero - set overflow flag and go to next operation
-		_flags = Tryte::tritwise_mult(_flags, Tryte("mmd"));
-		_i_ptr += 1;
-		return;
-	}
-
-	std::array<Tryte, 2> temp = Tryte::div(x, y);
-	x = temp[0];
-	y = temp[1];
-	_i_ptr += 1;
-}
-void CPU::div_tryte_by_num(Tryte& x)
-{
-	Tryte num = _memory[_i_ptr + 1];
-
-	if (x == 0)
-	{
-		_i_ptr += 1;
-		return;
-	}
-
-	if (num == 0)
+	catch(const std::runtime_error& e)
 	{
 		// divide by zero - set overflow flag and go to next operation
 		_flags = Tryte::tritwise_mult(_flags, Tryte("mmd"));
 		_flags += 9;
 		_i_ptr += 1;
-		return;
 	}
-
-	std::array<Tryte, 2> temp = Tryte::div(x, num);
-	x = temp[0];
-	_i_ptr += 2;
 }
-void CPU::div_trints(Trint<3>& x, Trint<3>& y)
+void CPU::div_tryte_by_num(Tryte& x)
 {
-	if (x == 0)
-	{
-		// 0 % y = 0
-		y = 0;
-		_i_ptr += 1;
-		return;
-	}
+	Tryte num = _memory[_i_ptr + 1];
 
-	if (y == 0)
+	try
+	{
+		std::array<Tryte, 2> div_result = Tryte::div(x, num);
+		x = div_result[0];
+		_i_ptr += 2;
+	}
+	catch(const std::runtime_error& e)
 	{
 		// divide by zero - set overflow flag and go to next operation
 		_flags = Tryte::tritwise_mult(_flags, Tryte("mmd"));
-		_i_ptr += 1;
-		return;
+		_flags += 9;
+		_i_ptr += 2;
 	}
-	
-	std::array<Trint<3>, 2> temp = Trint<3>::div(x, y);
-	x = temp[0];
-	y = temp[1];
-	_i_ptr += 1;
+}
+void CPU::div_trints(Trint<3>& x, Trint<3>& y)
+{
+	try
+	{
+		std::array<Trint<3>, 2> div_result = Trint<3>::div(x, y);
+		x = div_result[0];
+		y = div_result[1];
+		_i_ptr += 1;
+	}
+	catch(const std::runtime_error& e)
+	{
+		// divide by zero - set overflow flag and go to next operation
+		_flags = Tryte::tritwise_mult(_flags, Tryte("mmd"));
+		_flags += 9;
+		_i_ptr += 1;
+	}
 }
 void CPU::div_trint_by_num(Trint<3>& x)
 {
 	std::array<Tryte, 3> new_trint_array = { _memory[_i_ptr + 1], _memory[_i_ptr + 2], _memory[_i_ptr + 3] };
 	Trint<3> num(new_trint_array);
-	if (x == 0)
+	try
 	{
-		_i_ptr += 1;
-		return;
+		std::array<Trint<3>, 2> div_result = Trint<3>::div(x, num);
+		x = div_result[0];
+		_i_ptr += 4;
 	}
-	if (num == 0)
+	catch(const std::runtime_error& e)
 	{
 		// divide by zero - set overflow flag and go to next operation
 		_flags = Tryte::tritwise_mult(_flags, Tryte("mmd"));
-		_i_ptr += 1;
-		return;
+		_flags += 9;
+		_i_ptr += 4;
 	}
-	std::array<Trint<3>, 2> temp = Trint<3>::div(x, num);
-	x = temp[0];
-	// to be implemented!
-	_i_ptr += 4;
 }
 void CPU::shift_tryte_left(Tryte& x)
 {
-	size_t n = _memory[_i_ptr + 1].get_int() + 9841;
+	size_t n = Tryte::get_int(_memory[_i_ptr + 1]) + 9841;
 	x << n;
 	_i_ptr += 2;
 }
 void CPU::shift_trint_left(Trint<3>& x)
 {
-	size_t n = _memory[_i_ptr + 1].get_int() + 9841;
+	size_t n = Tryte::get_int(_memory[_i_ptr + 1]) + 9841;
 	x << n;
 	_i_ptr += 2;
 }
 void CPU::shift_tryte_right(Tryte& x)
 {
-	size_t n = _memory[_i_ptr + 1].get_int() + 9841;
+	size_t n = Tryte::get_int(_memory[_i_ptr + 1]) + 9841;
 	x >> n;
 	_i_ptr += 2;
 }
 void CPU::shift_trint_right(Trint<3>& x)
 {
-	size_t n = _memory[_i_ptr + 1].get_int() + 9841;
+	size_t n = Tryte::get_int(_memory[_i_ptr + 1]) + 9841;
 	x >> n;
 	_i_ptr += 2;
 }
@@ -1237,7 +1216,7 @@ void CPU::noop()
 }
 void CPU::jump_if_zero()
 {
-	int16_t compare_flag = Tryte::tritwise_mult(_flags, Tryte("00000000+")).get_int();
+	int16_t compare_flag = Tryte::get_int(Tryte::tritwise_mult(_flags, Tryte("00000000+")));
 	if (compare_flag == 0)
 	{
 		_i_ptr = _memory[_i_ptr + 1];
@@ -1249,7 +1228,7 @@ void CPU::jump_if_zero()
 }
 void CPU::jump_if_neg()
 {
-	int16_t compare_flag = Tryte::tritwise_mult(_flags, Tryte("00000000+")).get_int();
+	int16_t compare_flag = Tryte::get_int(Tryte::tritwise_mult(_flags, Tryte("00000000+")));
 	if (compare_flag < 0)
 	{
 		_i_ptr = _memory[_i_ptr + 1];
@@ -1261,7 +1240,7 @@ void CPU::jump_if_neg()
 }
 void CPU::jump_if_pos()
 {
-	int16_t compare_flag = Tryte::tritwise_mult(_flags, Tryte("00000000+")).get_int();
+	int16_t compare_flag = Tryte::get_int(Tryte::tritwise_mult(_flags, Tryte("00000000+")));
 	if (compare_flag > 0)
 	{
 		_i_ptr = _memory[_i_ptr + 1];
@@ -1299,10 +1278,10 @@ void CPU::set_interrupt_ptr(size_t n)
 void CPU::wait()
 {
 	bool waiting = true;
-	int16_t current_priority = (Tryte::tritwise_mult(_flags, Tryte("000+++000")) >> 3).get_int();
+	int16_t current_priority = Tryte::get_int(Tryte::tritwise_mult(_flags, Tryte("000+++000")) >> 3);
 	while (waiting)
 	{
-		int16_t stored_priority = (_flags >> 6).get_int();
+		int16_t stored_priority = Tryte::get_int(_flags >> 6);
 		if (stored_priority > current_priority)
 		{
 			switch_thread(stored_priority);

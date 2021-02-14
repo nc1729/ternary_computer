@@ -32,7 +32,7 @@ public:
 		/*
 		first generate a septavingtesmal representation of x
 		*/ 
-		int64_t dividend = abs(x);
+		int64_t dividend = x > 0 ? x : -x;
 		std::int16_t remainder = 0;
 		std::vector<int16_t> values;
 
@@ -367,15 +367,7 @@ public:
 		}
 
 		// convert trint into a big array
-		std::array<int16_t, 9 * n> big_tern_array;
-		for (size_t i = 0; i < n; i++)
-		{
-			std::array<int16_t, 9> tryte_tern_array = (*this)[i].Tryte::ternary_array();
-			for (size_t j = 0; j < 9; j++)
-			{
-				big_tern_array[9 * i + j] = tryte_tern_array[j];
-			}
-		}
+		std::array<int16_t, 9 * n> big_tern_array = Trint<n>::ternary_array(*this);
 
 		// now shift it
 		for (size_t i = 0; i < 9 * n - k; i++)
@@ -415,15 +407,7 @@ public:
 		}
 
 		// convert trint into a big array
-		std::array<int16_t, 9 * n> big_tern_array;
-		for (size_t i = 0; i < n; i++)
-		{
-			std::array<int16_t, 9> tryte_tern_array = (*this)[i].Tryte::ternary_array();
-			for (size_t j = 0; j < 9; j++)
-			{
-				big_tern_array[9 * i + j] = tryte_tern_array[j];
-			}
-		}
+		std::array<int16_t, 9 * n> big_tern_array = Trint<n>::ternary_array(*this);
 
 		// now shift it
 		for (size_t i = k; i < 9 * n; i++)
@@ -496,12 +480,129 @@ public:
 	static Trint<n> abs(Trint<n> const& x)
 	{
 		return x > 0 ? x : -x;
-	} 
-
-	static std::array<Trint<n>, 2> div(Trint<n> const& x, Trint<n> const& y)
+	}
+	static int64_t sign(Trint<n> const& x)
 	{
-		std::array<Trint<n>, 2> output = {0, 0};
+		if (x > 0)
+		{
+			return 1;
+		}
+		else if (x < 0)
+		{
+			return -1;
+		}
+		else
+		{
+			return 0;
+		}		
+	}
+
+	static std::array<Trint<n>, 2> div(Trint<n> const& t1, Trint<n> const& t2)
+	{
+		int64_t sign2 = Trint<n>::sign(t2);
+		// if sign2 == 0, throw an error
+		if (sign2 == 0)
+		{
+			throw std::runtime_error("Attempted to divide by zero.");
+		}
+
+		// compute 'size' of t1 and t2 - number of digits
+		int64_t size1 = 0;
+		std::array<int16_t, 9 * n> tern_array1 = Trint<n>::ternary_array(t1);
+		for (size_t i = 0; i < 9 * n; i++)
+		{
+			if (tern_array1[i] != 0 and size1 == 0)
+			{
+				size1++;
+			}
+			else if (size1 != 0)
+			{
+				size1++;
+			}
+		}
+		int64_t size2 = 0;
+		std::array<int16_t, 9 * n> tern_array2 = Trint<n>::ternary_array(t2);
+		for (size_t i = 0; i < 9 * n; i++)
+		{
+			if (tern_array2[i] != 0 and size2 == 0)
+			{
+				size2++;
+			}
+			else if (size2 != 0)
+			{
+				size2++;
+			}
+		}
+
+		// if size2 > size1, stop here
+		if (size2 > size1)
+		{
+			std::array<Trint<n>, 2> output = {0, t1};
+			return output;
+		}
+
+		int16_t shift = size1 - size2;
+		Trint<n> dividend = t1;
+		Trint<n> divisor = t2;
+		Trint<n> quotient = 0;
+		while (shift >= 0)
+		{
+			Trint<n> shift_up = dividend + (t2 << shift);
+			Trint<n> shift_down = dividend + -(t2 << shift);
+			std::array<Trint<n>, 3> test_array = {Trint<n>::abs(shift_up), Trint<n>::abs(dividend), Trint<n>::abs(shift_down)};
+			std::sort(test_array.begin(), test_array.end());
+			Trint<n> min_element = test_array[0];
+			if (min_element == Trint<n>::abs(shift_up))
+			{
+				// shift_up is smaller (disregarding signs)
+				dividend = shift_up;
+				quotient -= (t2 << shift);
+				shift -= 1;
+			}
+			else if (min_element == Trint<n>::abs(shift_down))
+			{
+				// shift_down is smaller (disregarding signs)
+				dividend = shift_down;
+				quotient += (t2 << shift);
+				shift -= 1;
+			}
+			else
+			{
+				// shifting up or down gets us further away from zero- do nothing
+				shift -= 1;
+			}
+		}
+		Trint<n> remainder = dividend;
+
+		// make remainder positive
+		if (remainder < 0)
+		{
+			if (divisor < 0)
+			{
+				remainder -= divisor;
+			}
+			else
+			{
+				remainder += divisor;
+			}
+		}
+		
+		std::array<Trint<n>, 2> output = {quotient, remainder};
 		return output;
+	}
+
+	static std::array<int16_t, 9 * n> ternary_array(Trint<n> const& x)
+	{
+		std::array<int16_t, 9 * n> output_tern_array;
+		for (size_t i = 0; i < n; i++)
+		{
+			std::array<int16_t, 9> tryte_tern_array = Tryte::ternary_array(x[i]);
+			for (size_t j = 0; j < 9; j++)
+			{
+				output_tern_array[9 * i + j] = tryte_tern_array[j];
+			}
+		}
+		return output_tern_array;
 	}
 
 	int64_t get_int() const

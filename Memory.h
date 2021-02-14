@@ -26,12 +26,12 @@ public:
 	}
 	Tryte& operator[](Tryte t)
 	{
-		int16_t tryte_val = t.get_int();
+		int16_t tryte_val = Tryte::get_int(t);
 		return _memory[tryte_val + 9841];
 	}
 	Tryte const& operator[](Tryte& t) const
 	{
-		int16_t tryte_val = t.get_int();
+		int16_t tryte_val = Tryte::get_int(t);
 		return _memory[tryte_val + 9841];
 	}
 	void dump_to_file(std::string& dump_filename)
