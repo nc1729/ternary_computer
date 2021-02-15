@@ -336,7 +336,7 @@ bool Tryte::operator>=(Tryte const& other) const
 }
 
 
-Tryte Tryte::operator&(Tryte const& other)
+Tryte Tryte::operator&(Tryte const& other) const
 {
     /*
     The ternary equivalent of the AND operator is applied to each pair of trits
@@ -363,7 +363,7 @@ Tryte& Tryte::operator&=(Tryte const& other)
     *this = *this & other;
     return *this;
 }
-Tryte Tryte::operator|(Tryte const& other)
+Tryte Tryte::operator|(Tryte const& other) const
 {
     /*
     The ternary equivalent of the OR operator is applied to each pair of trits
@@ -390,7 +390,7 @@ Tryte& Tryte::operator|=(Tryte const& other)
     *this = *this | other;
     return *this;
 }
-Tryte Tryte::operator^(Tryte const& other)
+Tryte Tryte::operator^(Tryte const& other) const
 {
     /*
     The ternary equivalent of the XOR operator is applied to each pair of trits
@@ -443,7 +443,7 @@ Tryte& Tryte::operator^=(Tryte const& other)
     return *this;
 }
 
-Tryte Tryte::operator~()
+Tryte Tryte::operator~() const
 {
     /*
     Ternary NOT operator. Truth table:
@@ -555,7 +555,7 @@ std::istream& operator>>(std::istream& is, Tryte& tryte)
     return is;
 }
 
-Tryte Tryte::operator+(Tryte const& other)
+Tryte Tryte::operator+(Tryte const& other) const
 {
     Tryte output("000");
     std::array<int16_t, 3> this_array = Tryte::septavingt_array(*this);
@@ -582,7 +582,7 @@ Tryte& Tryte::operator+=(Tryte const& other)
     (*this) = (*this) + other;
     return *this;
 }
-Tryte Tryte::operator-(Tryte const& other)
+Tryte Tryte::operator-(Tryte const& other) const
 {
     Tryte output;
     output = (*this) + (-other);
@@ -737,9 +737,8 @@ int64_t Tryte::sign(Tryte const& t)
 }
 std::array<Tryte, 2> Tryte::div(Tryte& t1, Tryte& t2)
 {
-    int64_t sign2 = Tryte::sign(t2);
-    // if sign2 == 0, throw an error
-    if (sign2 == 0)
+    // if t2 == 0, throw an error
+    if (t2 == 0)
     {
         throw std::runtime_error("Attempted to divide by zero.");
     }
@@ -787,21 +786,24 @@ std::array<Tryte, 2> Tryte::div(Tryte& t1, Tryte& t2)
     {
         Tryte shift_up = dividend + (t2 << shift);
         Tryte shift_down = dividend + -(t2 << shift);
-        std::array<Tryte, 3> test_array = {Tryte::abs(shift_up), Tryte::abs(dividend), Tryte::abs(shift_down)};
+        std::array<Tryte, 3> test_array = 
+        {Tryte::abs(shift_up), Tryte::abs(dividend), Tryte::abs(shift_down)};
+
         std::sort(test_array.begin(), test_array.end());
         Tryte min_element = test_array[0];
+        
         if (min_element == Tryte::abs(shift_up))
         {
             // shift_up is smaller (disregarding signs)
             dividend = shift_up;
-            quotient -= (t2 << shift);
+            quotient -= (Tryte(1) << shift);
             shift -= 1;
         }
         else if (min_element == Tryte::abs(shift_down))
         {
             // shift_down is smaller (disregarding signs)
             dividend = shift_down;
-            quotient += (t2 << shift);
+            quotient += (Tryte(1) << shift);
             shift -= 1;
         }
         else

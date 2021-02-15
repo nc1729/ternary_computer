@@ -55,13 +55,13 @@ class Tryte
     /*
     tritwise logical operators
     */
-    Tryte operator&(Tryte const& other);
+    Tryte operator&(Tryte const& other) const;
     Tryte& operator&=(Tryte const& other);
-    Tryte operator|(Tryte const& other);
+    Tryte operator|(Tryte const& other) const;
     Tryte& operator|=(Tryte const& other);
-    Tryte operator^(Tryte const& other);
+    Tryte operator^(Tryte const& other) const;
     Tryte& operator^=(Tryte const& other);
-    Tryte operator~();
+    Tryte operator~() const;
 
     /*
     tritwise shift operators
@@ -115,10 +115,10 @@ class Tryte
     arithmetic functions
     */
     // add two Trytes, but disregard carry
-    Tryte operator+(Tryte const& other);
+    Tryte operator+(Tryte const& other) const;
     Tryte& operator+=(Tryte const& other);
     // subtract Trytes, ignore carry
-    Tryte operator-(Tryte const& other);
+    Tryte operator-(Tryte const& other) const;
     Tryte& operator-=(Tryte const& other);
     // flip sign
     Tryte operator-() const;
