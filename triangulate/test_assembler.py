@@ -4,12 +4,12 @@ import assemble
 
 test_tryte_registers = {"A0": "M", "A1": "L", "A2": "K", "B0": "J", 
     "B1": "I", "B2": "H", "C0": "G", "C1": "F", "C2": "E", "D0": "D", 
-    "D1": "C", "D2": "B", "E0": "A", "E1": "0", "E2": "a", "F0": "b",
-    "F1": "c", "F2": "d", "G0": "e", "G1": "f", "G2": "g", "H0": "h",
-    "H1": "i", "H2": "j", "I0": "k", "I1": "l", "I2": "m"}
+    "D1": "C", "D2": "B", "E0": "A", "E1": "0", "E2": "a", "G0": "b",
+    "G1": "c", "G2": "d", "H0": "e", "H1": "f", "H2": "g", "I0": "h",
+    "I1": "i", "I2": "j", "J0": "k", "J1": "l", "J2": "m"}
 test_trint_registers = {"A": "D", "B": "C", "C": "B", "D": "A", 
-    "E": "0", "F": "a", "G": "b", "H": "c", "I": "d"}
-test_trint_register_names = "ABCDEFGHI"
+    "E": "0", "G": "a", "H": "b", "I": "c", "J": "d"}
+test_trint_register_names = "ABCDEGHIJ"
 test_septavingt_chars = "MLKJIHGFEDCBA0abcdefghijklm"
 
 def test_signed_value_to_tryte():

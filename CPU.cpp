@@ -1346,14 +1346,14 @@ void CPU::dump()
 	_console << _d;
 	std::cout << "\ne = ";
 	_console << _e;
-	std::cout << "\nf = ";
-	_console << _f;
 	std::cout << "\ng = ";
 	_console << _g;
 	std::cout << "\nh = ";
 	_console << _h;
 	std::cout << "\ni = ";
 	_console << _i;
+	std::cout << "\nj = ";
+	_console << _j;
 	std::cout << "\ni_ptr = " << _i_ptr << '\n';
 	std::cout << "\ns_ptr = " << _s_ptr << '\n';
 	std::cout << "Flags: " << _flags << '\n';
