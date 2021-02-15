@@ -45,30 +45,30 @@ class Tryte
     /*
     relational operators
     */
-    bool operator==(Tryte const& other);
-    bool operator!=(Tryte const& other);
-    bool operator<(Tryte const& other);
-    bool operator<=(Tryte const& other);
-    bool operator>(Tryte const& other);
-    bool operator>=(Tryte const& other);
+    bool operator==(Tryte const& other) const;
+    bool operator!=(Tryte const& other) const;
+    bool operator<(Tryte const& other) const;
+    bool operator<=(Tryte const& other) const;
+    bool operator>(Tryte const& other) const;
+    bool operator>=(Tryte const& other) const;
 
     /*
     tritwise logical operators
     */
-    Tryte operator&(Tryte const& other);
+    Tryte operator&(Tryte const& other) const;
     Tryte& operator&=(Tryte const& other);
-    Tryte operator|(Tryte const& other);
+    Tryte operator|(Tryte const& other) const;
     Tryte& operator|=(Tryte const& other);
-    Tryte operator^(Tryte const& other);
+    Tryte operator^(Tryte const& other) const;
     Tryte& operator^=(Tryte const& other);
-    Tryte operator~();
+    Tryte operator~() const;
 
     /*
     tritwise shift operators
     */
-    Tryte operator<<(uint16_t const& n);
+    Tryte operator<<(uint16_t const& n) const;
     Tryte& operator<<=(uint16_t const& n);
-    Tryte operator>>(uint16_t const& n);
+    Tryte operator>>(uint16_t const& n) const;
     Tryte& operator>>=(uint16_t const& n);
 
     /*
@@ -82,19 +82,19 @@ class Tryte
 
     */
     // convert Tryte into ternary string
-    std::string ternary_string() const;
+    std::string static ternary_string(Tryte const& t);
     // convert Tryte into septavingtesmal string
-    std::string  septavingt_string() const;
+    std::string static septavingt_string(Tryte const& t);
 
     /*
     Helpful functions
     */
     // convert Tryte into array of -1, 0, 1s
-    std::array<int16_t, 9> ternary_array() const;
+    std::array<int16_t, 9> static ternary_array(Tryte const& t);
     // convert Tryte into array of septavingtesmal values (-13 <= x <= 13)
-    std::array<int16_t, 3> septavingt_array() const;
+    std::array<int16_t, 3> static septavingt_array(Tryte const& t);
     // get integer equivalent of Tryte
-    int16_t get_int() const;
+    int16_t static get_int(Tryte const& t);
     // convert a ternary array into a short int, ready for Tryte
     int16_t static ternary_array_to_int(std::array<int16_t, 9> ternary_array);
     // convert a septavingtesmal array into a short int, ready for Tryte
@@ -115,10 +115,10 @@ class Tryte
     arithmetic functions
     */
     // add two Trytes, but disregard carry
-    Tryte operator+(Tryte const& other);
+    Tryte operator+(Tryte const& other) const;
     Tryte& operator+=(Tryte const& other);
     // subtract Trytes, ignore carry
-    Tryte operator-(Tryte const& other);
+    Tryte operator-(Tryte const& other) const;
     Tryte& operator-=(Tryte const& other);
     // flip sign
     Tryte operator-() const;
@@ -130,4 +130,10 @@ class Tryte
     static std::array<Tryte, 2> add_with_carry(Tryte const& t1, Tryte const& t2, Tryte const& carry);
     // mutliply two Trytes and keep the carry (for Trint ops)
     static std::array<Tryte, 2> mult(Tryte const& t1, Tryte const& t2);
+    // get the absolute value of a Tryte
+    static Tryte abs(Tryte const& t);
+    // get the sign of a Tryte
+    static int64_t sign(Tryte const& t);
+    // divide two Trytes and store the quotient and remainder
+    static std::array<Tryte, 2> div(Tryte& t1, Tryte& t2);
 };

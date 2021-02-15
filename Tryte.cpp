@@ -1,6 +1,7 @@
 #include "Tryte.h"
 #include <ciso646> // for and & or in Visual Studio
 #include <cstdint> // for int16_t
+#include <cassert> // for assert
 #include <algorithm> // for std::reverse (reverse string), std::min
 #include <string> // for std::string
 #include <vector> // for std::vector
@@ -11,10 +12,10 @@
 const std::string Tryte::ternary_chars = "-0+";
 const std::string Tryte::septavingt_chars = "MLKJIHGFEDCBA0abcdefghijklm";
 
-std::string Tryte::ternary_string() const
+std::string Tryte::ternary_string(Tryte const& t)
 {
     std::string output(9, '0');
-    std::array<int16_t, 9> tern_rep = ternary_array();
+    std::array<int16_t, 9> tern_rep = Tryte::ternary_array(t);
 
     // loop over the ternary array and construct the string
     for (int i = 0; i < 9; i++)
@@ -23,10 +24,10 @@ std::string Tryte::ternary_string() const
     }
     return output;
 }
-std::string Tryte::septavingt_string() const
+std::string Tryte::septavingt_string(Tryte const& t)
 {
     std::string output(3, '0');
-    std::array<int16_t, 3> sept_rep = septavingt_array();
+    std::array<int16_t, 3> sept_rep = Tryte::septavingt_array(t);
 
     // loop over septavingt array and construct the string
     for (int i = 0; i < 3; i++)
@@ -35,10 +36,11 @@ std::string Tryte::septavingt_string() const
     }
     return output;
 }
-std::array<int16_t, 9> Tryte::ternary_array() const
+std::array<int16_t, 9> Tryte::ternary_array(Tryte const& t)
 {
     std::array<int16_t, 9> output;
-    int16_t dividend = abs(this->m_tryte); // make positive for algorithm
+    // ensure dividend is positive (restore sign later)
+    int16_t dividend = t.m_tryte > 0 ? t.m_tryte : -t.m_tryte;
     int16_t remainder = 0;
 
     for (size_t i = 0; i < 9; i++)
@@ -56,7 +58,7 @@ std::array<int16_t, 9> Tryte::ternary_array() const
     }
 
     // flip the sign back if necessary
-    if (this->m_tryte < 0)
+    if (t.m_tryte < 0)
     {
         for (auto &trit : output)
         {
@@ -66,11 +68,11 @@ std::array<int16_t, 9> Tryte::ternary_array() const
 
     return output;
 }
-std::array<int16_t, 3> Tryte::septavingt_array() const
+std::array<int16_t, 3> Tryte::septavingt_array(Tryte const& t)
 {
     std::array<int16_t, 3> output;
     // First generate the ternary rep
-    std::array<int16_t, 9> tern = ternary_array();
+    std::array<int16_t, 9> tern = Tryte::ternary_array(t);
     std::array<int16_t, 3> trits;
 
     for (size_t i = 0; i < 3; i++)
@@ -84,9 +86,9 @@ std::array<int16_t, 3> Tryte::septavingt_array() const
 
     return output;
 }
-int16_t Tryte::get_int() const
+int16_t Tryte::get_int(Tryte const& t)
 {
-    return m_tryte;
+    return t.m_tryte;
 }
 int16_t Tryte::ternary_array_to_int(std::array<int16_t, 9> ternary_array)
 {
@@ -153,7 +155,7 @@ int16_t Tryte::septavingt_string_to_int(std::string s_string)
 int16_t Tryte::truncate_int(int64_t const& n)
 {
     // make input positive; it's just easier
-    int64_t dividend = abs(n);
+    int64_t dividend = n > 0 ? n : -n;
 
     int16_t remainder = 0;
     std::vector<int16_t> values;
@@ -308,33 +310,33 @@ Tryte Tryte::operator--(int)
     return temp;
 }
 
-bool Tryte::operator==(Tryte const& other)
+bool Tryte::operator==(Tryte const& other) const
 {
     return this->m_tryte == other.m_tryte;
 }
-bool Tryte::operator!=(Tryte const& other)
+bool Tryte::operator!=(Tryte const& other) const
 {
     return this->m_tryte != other.m_tryte;
 }
-bool Tryte::operator<(Tryte const& other)
+bool Tryte::operator<(Tryte const& other) const
 {
     return this->m_tryte < other.m_tryte;
 }
-bool Tryte::operator<=(Tryte const& other)
+bool Tryte::operator<=(Tryte const& other) const
 {
     return this->m_tryte <= other.m_tryte;
 }
-bool Tryte::operator>(Tryte const& other)
+bool Tryte::operator>(Tryte const& other) const
 {
     return this->m_tryte > other.m_tryte;
 }
-bool Tryte::operator>=(Tryte const& other)
+bool Tryte::operator>=(Tryte const& other) const
 {
     return this->m_tryte >= other.m_tryte;
 }
 
 
-Tryte Tryte::operator&(Tryte const& other)
+Tryte Tryte::operator&(Tryte const& other) const
 {
     /*
     The ternary equivalent of the AND operator is applied to each pair of trits
@@ -347,8 +349,8 @@ Tryte Tryte::operator&(Tryte const& other)
         0 | - | 0 | 0
         + | - | 0 | +
     */
-    std::array<int16_t, 9> this_array = this->ternary_array();
-    std::array<int16_t, 9> other_array = other.ternary_array();
+    std::array<int16_t, 9> this_array = Tryte::ternary_array(*this);
+    std::array<int16_t, 9> other_array = Tryte::ternary_array(other);
 
     for (size_t i = 0; i < 9; i++)
     {
@@ -361,7 +363,7 @@ Tryte& Tryte::operator&=(Tryte const& other)
     *this = *this & other;
     return *this;
 }
-Tryte Tryte::operator|(Tryte const& other)
+Tryte Tryte::operator|(Tryte const& other) const
 {
     /*
     The ternary equivalent of the OR operator is applied to each pair of trits
@@ -374,8 +376,8 @@ Tryte Tryte::operator|(Tryte const& other)
         0 | 0 | 0 | +
         + | + | + | +
     */
-    std::array<int16_t, 9> this_array = this->ternary_array();
-    std::array<int16_t, 9> other_array = other.ternary_array();
+    std::array<int16_t, 9> this_array = Tryte::ternary_array(*this);
+    std::array<int16_t, 9> other_array = Tryte::ternary_array(other);
 
     for (size_t i = 0; i < 9; i++)
     {
@@ -388,7 +390,7 @@ Tryte& Tryte::operator|=(Tryte const& other)
     *this = *this | other;
     return *this;
 }
-Tryte Tryte::operator^(Tryte const& other)
+Tryte Tryte::operator^(Tryte const& other) const
 {
     /*
     The ternary equivalent of the XOR operator is applied to each pair of trits
@@ -403,8 +405,8 @@ Tryte Tryte::operator^(Tryte const& other)
         + | + | 0 | -
     */
 
-    std::array<int16_t, 9> this_array = this->ternary_array();
-    std::array<int16_t, 9> other_array = other.ternary_array();
+    std::array<int16_t, 9> this_array = Tryte::ternary_array(*this);
+    std::array<int16_t, 9> other_array = Tryte::ternary_array(other);
 
     for (size_t i = 0; i < 9; i++)
     {
@@ -441,7 +443,7 @@ Tryte& Tryte::operator^=(Tryte const& other)
     return *this;
 }
 
-Tryte Tryte::operator~()
+Tryte Tryte::operator~() const
 {
     /*
     Ternary NOT operator. Truth table:
@@ -450,7 +452,7 @@ Tryte Tryte::operator~()
         -----------------
        ~A | + | 0 | -
     */
-   std::array<int16_t, 9> this_array = this->ternary_array();
+   std::array<int16_t, 9> this_array = Tryte::ternary_array(*this);
    for (size_t i = 0; i < 9; i++)
    {
        this_array[i] = -this_array[i];
@@ -458,10 +460,10 @@ Tryte Tryte::operator~()
    return Tryte(this_array);
 }
 
-Tryte Tryte::operator<<(uint16_t const& n)
+Tryte Tryte::operator<<(uint16_t const& n) const
 {
     // tritshift left. New values at the right of the tryte are filled with zeroes.
-    std::array<int16_t, 9> this_array = this->ternary_array();
+    std::array<int16_t, 9> this_array = Tryte::ternary_array(*this);
     std::array<int16_t, 9> new_array;
 
     if (n >= 9)
@@ -490,10 +492,10 @@ Tryte& Tryte::operator<<=(uint16_t const& n)
     *this = (*this << n);
     return *this;
 }
-Tryte Tryte::operator>>(uint16_t const& n)
+Tryte Tryte::operator>>(uint16_t const& n) const
 {
     // tritshift right. New values at the left of the tryte are filled with zeroes.
-    std::array<int16_t, 9> this_array = this->ternary_array();
+    std::array<int16_t, 9> this_array = Tryte::ternary_array(*this);
     std::array<int16_t, 9> new_array;
 
     if (n >= 9)
@@ -524,7 +526,7 @@ Tryte& Tryte::operator>>=(uint16_t const& n)
 
 std::ostream& operator<<(std::ostream& os, Tryte const& tryte)
 {
-    os << tryte.septavingt_string();
+    os << Tryte::septavingt_string(tryte);
     return os;
 }
 std::istream& operator>>(std::istream& is, Tryte& tryte)
@@ -553,11 +555,11 @@ std::istream& operator>>(std::istream& is, Tryte& tryte)
     return is;
 }
 
-Tryte Tryte::operator+(Tryte const& other)
+Tryte Tryte::operator+(Tryte const& other) const
 {
     Tryte output("000");
-    std::array<int16_t, 3> this_array = this->septavingt_array();
-    std::array<int16_t, 3> other_array = other.septavingt_array();
+    std::array<int16_t, 3> this_array = Tryte::septavingt_array(*this);
+    std::array<int16_t, 3> other_array = Tryte::septavingt_array(other);
     std::array<int16_t, 3> new_array = { 0, 0, 0 };
     int16_t carry = 0;
 
@@ -580,7 +582,7 @@ Tryte& Tryte::operator+=(Tryte const& other)
     (*this) = (*this) + other;
     return *this;
 }
-Tryte Tryte::operator-(Tryte const& other)
+Tryte Tryte::operator-(Tryte const& other) const
 {
     Tryte output;
     output = (*this) + (-other);
@@ -599,8 +601,8 @@ Tryte Tryte::operator-() const
 }
 Tryte Tryte::tritwise_add(Tryte const& t1, Tryte const& t2)
 {
-    std::array<int16_t, 9> t1_array = t1.ternary_array();
-    std::array<int16_t, 9> t2_array = t2.ternary_array();
+    std::array<int16_t, 9> t1_array = Tryte::ternary_array(t1);
+    std::array<int16_t, 9> t2_array = Tryte::ternary_array(t2);
     std::array<int16_t, 9> new_array;
     for (size_t i = 0; i < 9; i++)
     {
@@ -618,8 +620,8 @@ Tryte Tryte::tritwise_add(Tryte const& t1, Tryte const& t2)
 }
 Tryte Tryte::tritwise_mult(Tryte const& t1, Tryte const& t2)
 {
-    std::array<int16_t, 9> t1_array = t1.ternary_array();
-    std::array<int16_t, 9> t2_array = t2.ternary_array();
+    std::array<int16_t, 9> t1_array = Tryte::ternary_array(t1);
+    std::array<int16_t, 9> t2_array = Tryte::ternary_array(t2);
     std::array<int16_t, 9> new_array;
     for (size_t i = 0; i < 9; i++)
     {
@@ -630,9 +632,9 @@ Tryte Tryte::tritwise_mult(Tryte const& t1, Tryte const& t2)
 std::array<Tryte, 2> Tryte::add_with_carry(Tryte const& t1, Tryte const& t2, Tryte const& carry)
 {
     std::array<Tryte, 2> output = {0, 0};
-    std::array<int16_t, 3> t1_array = t1.septavingt_array();
-    std::array<int16_t, 3> t2_array = t2.septavingt_array();
-    std::array<int16_t, 3> carry_array = carry.septavingt_array();
+    std::array<int16_t, 3> t1_array = Tryte::septavingt_array(t1);
+    std::array<int16_t, 3> t2_array = Tryte::septavingt_array(t2);
+    std::array<int16_t, 3> carry_array = Tryte::septavingt_array(carry);
     std::array<int16_t, 4> new_array = {0, 0, 0, 0};
     int16_t new_carry = 0;
 
@@ -656,8 +658,8 @@ std::array<Tryte, 2> Tryte::add_with_carry(Tryte const& t1, Tryte const& t2, Try
 std::array<Tryte, 2> Tryte::mult(Tryte const& t1, Tryte const& t2)
 {
     std::array<Tryte, 2> output = {0, 0};
-    std::array<int16_t, 3> a = t1.septavingt_array();
-    std::array<int16_t, 3> b = t2.septavingt_array();
+    std::array<int16_t, 3> a = Tryte::septavingt_array(t1);
+    std::array<int16_t, 3> b = Tryte::septavingt_array(t2);
 
     // Basically want to perform long multiplcation
     // in balanced septavingtesmal.
@@ -713,4 +715,119 @@ std::array<Tryte, 2> Tryte::mult(Tryte const& t1, Tryte const& t2)
     output[1] = 729 * n[3] + 27 * n[4] + n[5];
 
     return output; 
+}
+Tryte Tryte::abs(Tryte const& t)
+{
+    return t > 0 ? t : -t;
+}
+int64_t Tryte::sign(Tryte const& t)
+{
+    if (t > 0)
+    {
+        return 1;
+    }
+    else if (t < 0)
+    {
+        return -1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+std::array<Tryte, 2> Tryte::div(Tryte& t1, Tryte& t2)
+{
+    // if t2 == 0, throw an error
+    if (t2 == 0)
+    {
+        throw std::runtime_error("Attempted to divide by zero.");
+    }
+
+    // compute 'size' of t1 and t2 - number of digits
+    int64_t size1 = 0;
+    std::array<int16_t, 9> tern_array1 = Tryte::ternary_array(t1);
+    for (size_t i = 0; i < 9; i++)
+    {
+        if (tern_array1[i] != 0 and size1 == 0)
+        {
+            size1++;
+        }
+        else if (size1 != 0)
+        {
+            size1++;
+        }
+    }
+    int64_t size2 = 0;
+    std::array<int16_t, 9> tern_array2 = Tryte::ternary_array(t2);
+    for (size_t i = 0; i < 9; i++)
+    {
+        if (tern_array2[i] != 0 and size2 == 0)
+        {
+            size2++;
+        }
+        else if (size2 != 0)
+        {
+            size2++;
+        }
+    }
+
+    // if size2 > size1, stop here
+    if (size2 > size1)
+    {
+        std::array<Tryte, 2> output = {0, t1};
+        return output;
+    }
+
+    int16_t shift = size1 - size2;
+    Tryte dividend = t1;
+    Tryte divisor = t2;
+    Tryte quotient = 0;
+    while (shift >= 0)
+    {
+        Tryte shift_up = dividend + (t2 << shift);
+        Tryte shift_down = dividend + -(t2 << shift);
+        std::array<Tryte, 3> test_array = 
+        {Tryte::abs(shift_up), Tryte::abs(dividend), Tryte::abs(shift_down)};
+
+        std::sort(test_array.begin(), test_array.end());
+        Tryte min_element = test_array[0];
+        
+        if (min_element == Tryte::abs(shift_up))
+        {
+            // shift_up is smaller (disregarding signs)
+            dividend = shift_up;
+            quotient -= (Tryte(1) << shift);
+            shift -= 1;
+        }
+        else if (min_element == Tryte::abs(shift_down))
+        {
+            // shift_down is smaller (disregarding signs)
+            dividend = shift_down;
+            quotient += (Tryte(1) << shift);
+            shift -= 1;
+        }
+        else
+        {
+            // shifting up or down gets us further away from zero- do nothing
+            shift -= 1;
+        }
+    }
+    Tryte remainder = dividend;
+
+    // make remainder positive
+    if (remainder < 0)
+    {
+        if (divisor < 0)
+        {
+            remainder -= divisor;
+        }
+        else
+        {
+            remainder += divisor;
+        }
+    }
+    
+    std::array<Tryte, 2> output = {quotient, remainder};
+    return output;
+
 }

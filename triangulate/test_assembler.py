@@ -169,13 +169,23 @@ def test_FLIP():
         test_output = assemble.assemble_instr(["FLIP", trint, 7])
         assert(test_output == expected_output)
 
+def test_ABS():
+    for tryte in test_tryte_registers:
+        expected_output = [["KA" + test_tryte_registers[tryte]], 1]
+        test_output = assemble.assemble_instr(["ABS", tryte, 7])
+        assert(test_output == expected_output)
+    for trint in test_trint_registers:
+        expected_output = [["kA" + test_trint_registers[trint]], 1]
+        test_output = assemble.assemble_instr(["ABS", trint, 7])
+        assert(test_output == expected_output)
+
 def test_NOT():
     for tryte in test_tryte_registers:
-        expected_output = [["Kc" + test_tryte_registers[tryte]], 1]
+        expected_output = [["KB" + test_tryte_registers[tryte]], 1]
         test_output = assemble.assemble_instr(["NOT", tryte, 7])
         assert(test_output == expected_output)
     for trint in test_trint_registers:
-        expected_output = [["kc" + test_trint_registers[trint]], 1]
+        expected_output = [["kB" + test_trint_registers[trint]], 1]
         test_output = assemble.assemble_instr(["NOT", trint, 7])
         assert(test_output == expected_output)
 

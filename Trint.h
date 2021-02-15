@@ -32,7 +32,7 @@ public:
 		/*
 		first generate a septavingtesmal representation of x
 		*/ 
-		int64_t dividend = abs(x);
+		int64_t dividend = x > 0 ? x : -x;
 		std::int16_t remainder = 0;
 		std::vector<int16_t> values;
 
@@ -134,7 +134,7 @@ public:
 	/*
 	arithmetic operators
 	*/
-	Trint<n> operator+(Trint<n> const& other)
+	Trint<n> operator+(Trint<n> const& other) const
 	{
 		Trint<n> output;
 		Tryte carry;
@@ -153,7 +153,7 @@ public:
 		*this = *this + other;
 		return *this;
 	}
-	Trint<n> operator-()
+	Trint<n> operator-() const
 	{
 		Trint<n> output = *this;
 		for (size_t i = 0; i < n; i++)
@@ -162,7 +162,7 @@ public:
 		}
 		return output;
 	}
-	Trint<n> operator-(Trint<n> const& other)
+	Trint<n> operator-(Trint<n> const& other) const
 	{
 		Trint<n> output = *this;
 		for (size_t i = 0; i < n; i++)
@@ -176,7 +176,7 @@ public:
 		*this = *this - other;
 		return *this;
 	}
-	Trint<n> operator*(Trint<n> const& other)
+	Trint<n> operator*(Trint<n> const& other) const
 	{
 		// store intermediate results in array of Trints
 		std::array<Trint<n>, n> products;
@@ -232,7 +232,7 @@ public:
 	/*
 	relational operators
 	*/
-	bool operator==(Trint<n> const& other)
+	bool operator==(Trint<n> const& other) const
 	{
 		for (size_t i = 0; i < n; i++)
 		{
@@ -243,7 +243,7 @@ public:
 		}
 		return true;
 	}
-	bool operator!=(Trint<n> const& other)
+	bool operator!=(Trint<n> const& other) const
 	{
 		for (size_t i = 0; i < n; i++)
 		{
@@ -254,7 +254,7 @@ public:
 		}
 		return false;
 	}
-	bool operator<(Trint<n> const& other)
+	bool operator<(Trint<n> const& other) const
 	{
 		for (size_t i = 0; i < n; i++)
 		{
@@ -262,17 +262,21 @@ public:
 			{
 				return true;
 			}
+			else if ((*this)[i] > other[i])
+			{
+				return false;
+			}
 		}
 		return false;
 	}
-	bool operator<=(Trint<n> const& other)
+	bool operator<=(Trint<n> const& other) const
 	{
 		if ((*this) < other or (*this) == other)
 		{
 			return true;
 		}
 	}
-	bool operator>(Trint<n> const& other)
+	bool operator>(Trint<n> const& other) const
 	{
 		for (size_t i = 0; i < n; i++)
 		{
@@ -280,10 +284,14 @@ public:
 			{
 				return true;
 			}
+			else if ((*this)[i] < other[i])
+			{
+				return false;
+			}
 		}
 		return false;
 	}
-	bool operator>=(Trint<n> const& other)
+	bool operator>=(Trint<n> const& other) const
 	{
 		if ((*this) > other or (*this) == other)
 		{
@@ -294,7 +302,7 @@ public:
 	/*
 	tritwise logical operators
 	*/
-	Trint<n> operator&(Trint<n> const& other)
+	Trint<n> operator&(Trint<n> const& other) const
 	{
 		Trint<n> output;
 		for (size_t i = 0; i < n; i++)
@@ -311,7 +319,7 @@ public:
 		}
 		return *this;
 	}
-	Trint<n> operator|(Trint<n> const& other)
+	Trint<n> operator|(Trint<n> const& other) const
 	{
 		Trint<n> output;
 		for (size_t i = 0; i < n; i++)
@@ -328,7 +336,7 @@ public:
 		}
 		return *this;
 	}
-	Trint<n> operator^(Trint<n> const& other)
+	Trint<n> operator^(Trint<n> const& other) const
 	{
 		Trint<n> output;
 		for (size_t i = 0; i < n; i++)
@@ -345,7 +353,7 @@ public:
 		}
 		return *this;
 	}
-	Trint<n> operator~()
+	Trint<n> operator~() const
 	{
 		Trint<n> output;
 		for (size_t i = 0; i < n; i++)
@@ -358,7 +366,7 @@ public:
 	/*
 	tritwise shift operators
 	*/
-	Trint<n> operator<<(size_t const& k)
+	Trint<n> operator<<(size_t const& k) const
 	{
 		// if we shift left too far, just get zero
 		if (k >= 9 * n)
@@ -367,15 +375,7 @@ public:
 		}
 
 		// convert trint into a big array
-		std::array<int16_t, 9 * n> big_tern_array;
-		for (size_t i = 0; i < n; i++)
-		{
-			std::array<int16_t, 9> tryte_tern_array = (*this)[i].Tryte::ternary_array();
-			for (size_t j = 0; j < 9; j++)
-			{
-				big_tern_array[9 * i + j] = tryte_tern_array[j];
-			}
-		}
+		std::array<int16_t, 9 * n> big_tern_array = Trint<n>::ternary_array(*this);
 
 		// now shift it
 		for (size_t i = 0; i < 9 * n - k; i++)
@@ -406,7 +406,7 @@ public:
 		*this = (*this << k);
 		return *this;
 	}
-	Trint<n> operator>>(size_t const& k)
+	Trint<n> operator>>(size_t const& k) const
 	{
 		// if we shift right too far, just get zero
 		if (k >= 9 * n)
@@ -415,15 +415,7 @@ public:
 		}
 
 		// convert trint into a big array
-		std::array<int16_t, 9 * n> big_tern_array;
-		for (size_t i = 0; i < n; i++)
-		{
-			std::array<int16_t, 9> tryte_tern_array = (*this)[i].Tryte::ternary_array();
-			for (size_t j = 0; j < 9; j++)
-			{
-				big_tern_array[9 * i + j] = tryte_tern_array[j];
-			}
-		}
+		std::array<int16_t, 9 * n> big_tern_array = Trint<n>::ternary_array(*this);
 
 		// now shift it
 		for (size_t i = k; i < 9 * n; i++)
@@ -493,13 +485,156 @@ public:
 		return output_trint + carry_trint;
 	}
 
-	int64_t get_int() const
+	static Trint<n> abs(Trint<n> const& x)
+	{
+		if (x > 0)
+		{
+			return x;
+		}
+		else if (x < 0)
+		{
+			return -x;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	static int64_t sign(Trint<n> const& x)
+	{
+		if (x > 0)
+		{
+			return 1;
+		}
+		else if (x < 0)
+		{
+			return -1;
+		}
+		else
+		{
+			return 0;
+		}		
+	}
+
+	static std::array<Trint<n>, 2> div(Trint<n> const& t1, Trint<n> const& t2)
+	{
+		// if t2 == 0, throw an error
+		if (t2 == 0)
+		{
+			throw std::runtime_error("Attempted to divide by zero.");
+		}
+
+		// compute 'size' of t1 and t2 - number of digits
+		int64_t size1 = 0;
+		std::array<int16_t, 9 * n> tern_array1 = Trint<n>::ternary_array(t1);
+		for (size_t i = 0; i < 9 * n; i++)
+		{
+			if (tern_array1[i] != 0 and size1 == 0)
+			{
+				size1++;
+			}
+			else if (size1 != 0)
+			{
+				size1++;
+			}
+		}
+		int64_t size2 = 0;
+		std::array<int16_t, 9 * n> tern_array2 = Trint<n>::ternary_array(t2);
+		for (size_t i = 0; i < 9 * n; i++)
+		{
+			if (tern_array2[i] != 0 and size2 == 0)
+			{
+				size2++;
+			}
+			else if (size2 != 0)
+			{
+				size2++;
+			}
+		}
+
+		// if size2 > size1, stop here
+		if (size2 > size1)
+		{
+			std::array<Trint<n>, 2> output = {0, t1};
+			return output;
+		}
+
+		int16_t shift = size1 - size2;
+		Trint<n> dividend = t1;
+		Trint<n> divisor = t2;
+		Trint<n> quotient = 0;
+		while (shift >= 0)
+		{
+			Trint<n> shift_up = dividend + (t2 << shift);
+			Trint<n> shift_down = dividend + -(t2 << shift);
+
+			std::array<Trint<n>, 3> test_array = 
+			{Trint<n>::abs(shift_up), Trint<n>::abs(dividend), Trint<n>::abs(shift_down)};
+
+			std::sort(test_array.begin(), test_array.end());
+			Trint<n> min_element = test_array[0];
+			
+			if (min_element == Trint<n>::abs(shift_up))
+			{
+				// shift_up is smaller (disregarding signs)
+				dividend = shift_up;
+				quotient -= (Trint<n>(1) << shift);
+				shift -= 1;
+			}
+			else if (min_element == Trint<n>::abs(shift_down))
+			{
+				// shift_down is smaller (disregarding signs)
+				dividend = shift_down;
+				quotient += (Trint<n>(1) << shift);
+				shift -= 1;
+			}
+			else
+			{
+				// shifting up or down gets us further away from zero- do nothing
+				shift -= 1;
+			}
+			std::cout << '\n';
+		}
+		Trint<n> remainder = dividend;
+
+		// make remainder positive
+		if (remainder < 0)
+		{
+			if (divisor < 0)
+			{
+				remainder -= divisor;
+			}
+			else
+			{
+				remainder += divisor;
+			}
+		}
+		
+		std::array<Trint<n>, 2> output = {quotient, remainder};
+		return output;
+	}
+
+	static std::array<int16_t, 9 * n> ternary_array(Trint<n> const& x)
+	{
+		std::array<int16_t, 9 * n> output_tern_array;
+		for (size_t i = 0; i < n; i++)
+		{
+			std::array<int16_t, 9> tryte_tern_array = Tryte::ternary_array(x[i]);
+			for (size_t j = 0; j < 9; j++)
+			{
+				output_tern_array[9 * i + j] = tryte_tern_array[j];
+			}
+		}
+		return output_tern_array;
+	}
+
+	static int64_t get_int(Trint<n> const& t)
 	{
 		int64_t output = 0;
 		int64_t power_of_19683 = 1;
 		for (size_t i = 0; i < n; i++)
 		{
-			output += ((*this)[n - i - 1]).get_int() * power_of_19683;
+			output += Tryte::get_int(t[n - i - 1]) * power_of_19683;
 			power_of_19683 *= 19683;
 		}
 

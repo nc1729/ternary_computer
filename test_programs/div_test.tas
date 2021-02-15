@@ -1,0 +1,17 @@
+main:
+    SET A, -3812798742493
+    SET B, 3812798742493
+    STRPNT "A = "
+    SHOW A
+    STRPNT "\n"
+    STRPNT "B = "
+    SHOW B
+    STRPNT "\n"
+    DIV A, B
+    STRPNT "A / B = "
+    SHOW A
+    STRPNT "\n"
+    STRPNT "A % B = "
+    SHOW B
+    STRPNT "\n"
+end main

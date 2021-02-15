@@ -74,6 +74,7 @@ def assemble_instr(statement):
         "AND": handle_instr.AND,
         "OR": handle_instr.OR,
         "XOR": handle_instr.XOR,
+        "ABS": handle_instr.ABS,
         "NOT": handle_instr.NOT,
         "NOOP": handle_instr.NOOP,
         "JPZ": handle_instr.JPZ,

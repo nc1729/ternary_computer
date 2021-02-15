@@ -29,10 +29,10 @@ Console& Console::operator>>(char input)
 
 std::string Console::process_tryte(Tryte& t)
 {
-	int16_t tryte_int = t.get_int();
+	int16_t tryte_int = Tryte::get_int(t);
 	std::string out_string = "";
-	char first_char = (tryte_int + 9841) / 128;
-	char second_char = (tryte_int + 9841) % 128;
+	uint8_t first_char = (tryte_int + 9841) / 128;
+	uint8_t second_char = (tryte_int + 9841) % 128;
 	// strip away zeroes in Tryte
 	if (first_char == 0)
 	{
@@ -58,6 +58,6 @@ std::string Console::process_tryte(Tryte& t)
 }
 int64_t Console::process_trint(Trint<3>& trint)
 {
-	return trint.get_int();
+	return Trint<3>::get_int(trint);
 	
 }
