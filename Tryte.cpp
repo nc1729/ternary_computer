@@ -735,6 +735,23 @@ int64_t Tryte::sign(Tryte const& t)
         return 0;
     }
 }
+int64_t Tryte::size(Tryte const& t)
+{
+    int64_t output = 0;
+    std::array<int16_t, 9> tern_array = Tryte::ternary_array(t);
+    for (size_t i = 0; i < 9; i++)
+    {
+        if (tern_array[i] != 0 and output == 0)
+        {
+            output++;
+        }
+        else if (output != 0)
+        {
+            output++;
+        }
+    }
+    return output;
+}
 std::array<Tryte, 2> Tryte::div(Tryte& t1, Tryte& t2)
 {
     // if t2 == 0, throw an error
@@ -744,32 +761,8 @@ std::array<Tryte, 2> Tryte::div(Tryte& t1, Tryte& t2)
     }
 
     // compute 'size' of t1 and t2 - number of digits
-    int64_t size1 = 0;
-    std::array<int16_t, 9> tern_array1 = Tryte::ternary_array(t1);
-    for (size_t i = 0; i < 9; i++)
-    {
-        if (tern_array1[i] != 0 and size1 == 0)
-        {
-            size1++;
-        }
-        else if (size1 != 0)
-        {
-            size1++;
-        }
-    }
-    int64_t size2 = 0;
-    std::array<int16_t, 9> tern_array2 = Tryte::ternary_array(t2);
-    for (size_t i = 0; i < 9; i++)
-    {
-        if (tern_array2[i] != 0 and size2 == 0)
-        {
-            size2++;
-        }
-        else if (size2 != 0)
-        {
-            size2++;
-        }
-    }
+    int64_t size1 = Tryte::size(t1);
+    int64_t size2 = Tryte::size(t2);
 
     // if size2 > size1, stop here
     if (size2 > size1)

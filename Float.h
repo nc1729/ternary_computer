@@ -30,18 +30,20 @@ class TFloat
 
     // floating point arithmetic
     TFloat operator+(TFloat const& other) const;
-    TFloat operator+=(TFloat const& other) const;
+    TFloat& operator+=(TFloat const& other);
     TFloat operator-() const;
     TFloat operator-(TFloat const& other) const;
-    TFloat operator-=(TFloat const& other) const;
+    TFloat& operator-=(TFloat const& other);
     TFloat operator*(TFloat const& other) const;
-    TFloat operator*=(TFloat const& other) const;
+    TFloat& operator*=(TFloat const& other);
     TFloat operator/(TFloat const& other) const;
-    TFloat operator/=(TFloat const& other) const;
+    TFloat& operator/=(TFloat const& other);
     static TFloat abs(TFloat const& t);
     static bool isnan(TFloat const& t);
 
     // helpful functions
+    void normalise();
+    static int64_t sign(TFloat const& t);
     static Trint<1> get_exponent(TFloat const& t);
     static Trint<2> get_mantissa(TFloat const& t);
     static double get_double(TFloat const& t);

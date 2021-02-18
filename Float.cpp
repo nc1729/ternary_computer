@@ -95,6 +95,8 @@ TFloat::TFloat(Trint<1> const& exponent, Trint<2> const& mantissa)
 {
     _exponent = exponent;
     _mantissa = mantissa;
+    // in case the input Trints are not formatted correctly, normalise
+    this->normalise();
 }
 TFloat::TFloat(TFloat const& other)
 {
@@ -131,8 +133,373 @@ bool TFloat::operator<(TFloat const& other) const
     int64_t this_sign = Trint<2>::sign(_mantissa);
     int64_t other_sign = Trint<2>::sign(other._mantissa);
 
-    if (_exponent < other._exponent)
+    if (this_sign < other_sign)
     {
-        // compare signs
+        return true;
     }
+    else if (this_sign > other_sign)
+    {
+        return false;
+    }
+    else
+    {
+        // signs are equal
+        if (this_sign == 1)
+        {
+            if (this->_exponent < other._exponent)
+            {
+                return true;
+            }
+            else if (this->_exponent > other._exponent)
+            {
+                return false;
+            }
+            else
+            {
+                // exponents are equal, compare mantissas
+                if (this->_mantissa < other._mantissa)
+                {
+                    return true;
+                }
+                else if (this->_mantissa > other._mantissa)
+                {
+                    return false;
+                }
+                else
+                {
+                    // both floats are equal
+                    return false;
+                }
+            }
+        }
+        else if (this_sign == -1)
+        {
+            if (this->_exponent < other._exponent)
+            {
+                return false;
+            }
+            else if (this->_exponent > other._exponent)
+            {
+                return true;
+            }
+            else
+            {
+                // exponents are equal, compare mantissas
+                if (this->_mantissa < other._mantissa)
+                {
+                    return true;
+                }
+                else if (this->_mantissa > other._mantissa)
+                {
+                    return false;
+                }
+                else
+                {
+                    // both floats are equal
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            // both signs are zero, floats are equal
+            return false;
+        }   
+    }
+}
+bool TFloat::operator<=(TFloat const& other) const
+{
+    if ((*this) < other or (*this) == other)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+bool TFloat::operator>(TFloat const& other) const
+{
+    // these should be zero if and only if this or other == 0
+    int64_t this_sign = Trint<2>::sign(_mantissa);
+    int64_t other_sign = Trint<2>::sign(other._mantissa);
+
+    if (this_sign < other_sign)
+    {
+        return false;
+    }
+    else if (this_sign > other_sign)
+    {
+        return true;
+    }
+    else
+    {
+        // signs are equal
+        if (this_sign == 1)
+        {
+            if (this->_exponent < other._exponent)
+            {
+                return false;
+            }
+            else if (this->_exponent > other._exponent)
+            {
+                return true;
+            }
+            else
+            {
+                // exponents are equal, compare mantissas
+                if (this->_mantissa < other._mantissa)
+                {
+                    return false;
+                }
+                else if (this->_mantissa > other._mantissa)
+                {
+                    return true;
+                }
+                else
+                {
+                    // both floats are equal
+                    return false;
+                }
+            }
+        }
+        else if (this_sign == -1)
+        {
+            if (this->_exponent < other._exponent)
+            {
+                return true;
+            }
+            else if (this->_exponent > other._exponent)
+            {
+                return false;
+            }
+            else
+            {
+                // exponents are equal, compare mantissas
+                if (this->_mantissa < other._mantissa)
+                {
+                    return false;
+                }
+                else if (this->_mantissa > other._mantissa)
+                {
+                    return true;
+                }
+                else
+                {
+                    // both floats are equal
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            // both signs are zero, floats are equal
+            return false;
+        }   
+    }
+}
+bool TFloat::operator>=(TFloat const& other) const
+{
+    if ((*this) > other or (*this) == other)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+// stream operators
+std::ostream& operator<<(std::ostream& os, TFloat const& t)
+{
+    // print exponent first
+    os << t._exponent;
+
+    // then print mantissa
+    os << t._mantissa;
+
+    return os;
+}
+std::istream& operator>>(std::istream& is, TFloat const& t)
+{
+    // fetch exponent first
+    is >> t._exponent;
+
+    // then fetch mantissa
+    is >> t._mantissa;
+
+    return is;
+}
+
+// floating point arithmetic
+TFloat TFloat::operator+(TFloat const& other) const
+{
+    TFloat output = 0;
+    int16_t shift = Tryte::get_int(this->_exponent[0] - other._exponent[0]);
+    if (shift > 0)
+    {
+        if (shift > 18)
+        {
+            // other float is so much smaller than this one it's insignificant
+            return *this;
+        }
+        else
+        {
+            // copy other into output and shift its mantissa and exponent to match this
+            size_t shift_right = shift;
+            output._mantissa = (other._mantissa >> shift_right);
+            output._exponent = (other._exponent + shift_right);
+
+            // now add this and other's mantissas (keeping track of carries!)
+            std::array<Tryte, 2> temp;
+            temp = Tryte::add_with_carry(this->_mantissa[1], output._mantissa[1], 0);
+            output._mantissa[1] = temp[1];
+            temp = Tryte::add_with_carry(this->_mantissa[0], output._mantissa[0], temp[0]);
+            output._mantissa[0] = temp[1];
+
+            // need to handle the carry
+            int64_t carry_size = Tryte::size(temp[0]);
+            if (carry_size > 0)
+            {
+                std::array<Tryte, 3> mantissa_array = {temp[0], output._mantissa[0], output._mantissa[1]};
+                Trint<3> mantissa_with_carry(mantissa_array);
+
+                // tritshift right the mantissa with carry until the left Tryte is zero (using its size)
+                mantissa_with_carry >>= carry_size;
+                // then add the shift to the exponent
+                output._exponent[0] += carry_size;
+            }
+            
+            // ensure output is normalised
+            output.normalise();
+            return output;
+        }       
+    }
+    else if (shift < 0)
+    {
+        if (shift < -18)
+        {
+            // this float is so much smaller than other it's insignificant
+            return other;
+        }
+        else
+        {
+            // copy this into output and shift its mantissa and exponent to match other
+            size_t shift_right = -shift;
+            output._mantissa = (this->_mantissa >> shift_right);
+            output._exponent = (this->_exponent + shift_right);
+
+            // now add this and other's mantissas (keeping track of carries!)
+            std::array<Tryte, 2> temp;
+            temp = Tryte::add_with_carry(other._mantissa[1], output._mantissa[1], 0);
+            output._mantissa[1] = temp[1];
+            temp = Tryte::add_with_carry(other._mantissa[0], output._mantissa[0], temp[0]);
+            output._mantissa[0] = temp[1];
+
+            // need to handle the carry
+            int64_t carry_size = Tryte::size(temp[0]);
+            if (carry_size > 0)
+            {
+                std::array<Tryte, 3> mantissa_array = {temp[0], output._mantissa[0], output._mantissa[1]};
+                Trint<3> mantissa_with_carry(mantissa_array);
+
+                // tritshift right the mantissa with carry until the left Tryte is zero (using its size)
+                mantissa_with_carry >>= carry_size;
+                // then add the shift to the exponent
+                output._exponent[0] += carry_size;
+            }
+
+            // ensure output is normalised
+            output.normalise();
+            return output;
+        }
+    }
+    else
+    {
+        // exponents match already, just need to add mantissas
+        output._mantissa = this->_mantissa;
+        output._exponent = this->_exponent;
+
+        std::array<Tryte, 2> temp;
+        temp = Tryte::add_with_carry(other._mantissa[1], output._mantissa[1], 0);
+        output._mantissa[1] = temp[1];
+        temp = Tryte::add_with_carry(other._mantissa[0], output._mantissa[0], temp[0]);
+        output._mantissa[0] = temp[1];
+
+        // need to handle the carry
+        int64_t carry_size = Tryte::size(temp[0]);
+        if (carry_size > 0)
+        {
+            std::array<Tryte, 3> mantissa_array = {temp[0], output._mantissa[0], output._mantissa[1]};
+            Trint<3> mantissa_with_carry(mantissa_array);
+
+            // tritshift right the mantissa with carry until the left Tryte is zero (using its size)
+            mantissa_with_carry >>= carry_size;
+            // then add the shift to the exponent
+            output._exponent[0] += carry_size;
+        }
+
+        // normalise output
+        output.normalise();
+
+        return output;
+    }
+}
+TFloat& TFloat::operator+=(TFloat const& other)
+{
+    *this = *this + other;
+    return *this;
+}
+TFloat TFloat::operator-() const
+{
+    TFloat output;
+    output._mantissa = -(this->_mantissa);
+    output._exponent = this->_exponent;
+    return output;
+}
+TFloat TFloat::operator-(TFloat const& other) const
+{
+    return *this + (-other);
+}
+TFloat& TFloat::operator-=(TFloat const& other)
+{
+    *this = *this - other;
+    return *this;
+}
+TFloat TFloat::operator*(TFloat const& other) const
+{
+    // multiply mantissas, add exponents, and carry things as required
+}
+
+void TFloat::normalise()
+{
+    int64_t sign = Trint<2>::sign(_mantissa);
+    if (sign > 0)
+    {
+        // +-------- = 3281
+        while (_mantissa[0] < 3281)
+        {
+            _mantissa *= 3;
+            _exponent -= 1;
+        }
+    }
+    else if (sign < 0)
+    {
+        // -++++++++ = -3281
+        while (_mantissa[0] > -3281)
+        {
+            _mantissa *= 3;
+            _exponent -= 1;
+        }
+    }
+    else
+    {
+        // float must be zero, set exponent to zero too
+        _exponent = 0;
+    }    
+}
+int64_t TFloat::sign(TFloat const& t)
+{
+    return Trint<2>::sign(t._mantissa);
 }

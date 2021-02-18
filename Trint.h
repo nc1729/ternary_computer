@@ -275,6 +275,11 @@ public:
 		{
 			return true;
 		}
+		else
+		{
+			return false;
+		}
+		
 	}
 	bool operator>(Trint<n> const& other) const
 	{
@@ -296,6 +301,10 @@ public:
 		if ((*this) > other or (*this) == other)
 		{
 			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 
