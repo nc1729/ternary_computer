@@ -91,6 +91,10 @@ public:
 	{
 		if (m < n)
 		{
+			for (size_t i = 0; i < n - m; i++)
+			{
+				_data[i] = 0;
+			}
 			for (size_t i = n - m; i < n; i++)
 			{
 				_data[i] = trint[i - (n - m)];
@@ -636,7 +640,15 @@ public:
 		}
 		return output_tern_array;
 	}
-
+	static size_t length(Trint<n> const& t)
+	{
+		size_t output = 0;
+		for (size_t i = 0; i < n; i++)
+		{
+			output += Tryte::length(t._data[i]);
+		}
+		return output;
+	}
 	static int64_t get_int(Trint<n> const& t)
 	{
 		int64_t output = 0;

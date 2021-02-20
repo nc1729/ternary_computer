@@ -359,7 +359,7 @@ TFloat TFloat::operator+(TFloat const& other) const
             output._mantissa[0] = temp[1];
 
             // need to handle the carry
-            int64_t carry_size = Tryte::size(temp[0]);
+            size_t carry_size = Tryte::length(temp[0]);
             if (carry_size > 0)
             {
                 std::array<Tryte, 3> mantissa_array = {temp[0], output._mantissa[0], output._mantissa[1]};
@@ -398,7 +398,7 @@ TFloat TFloat::operator+(TFloat const& other) const
             output._mantissa[0] = temp[1];
 
             // need to handle the carry
-            int64_t carry_size = Tryte::size(temp[0]);
+            size_t carry_size = Tryte::length(temp[0]);
             if (carry_size > 0)
             {
                 std::array<Tryte, 3> mantissa_array = {temp[0], output._mantissa[0], output._mantissa[1]};
@@ -428,7 +428,7 @@ TFloat TFloat::operator+(TFloat const& other) const
         output._mantissa[0] = temp[1];
 
         // need to handle the carry
-        int64_t carry_size = Tryte::size(temp[0]);
+        size_t carry_size = Tryte::length(temp[0]);
         if (carry_size > 0)
         {
             std::array<Tryte, 3> mantissa_array = {temp[0], output._mantissa[0], output._mantissa[1]};
