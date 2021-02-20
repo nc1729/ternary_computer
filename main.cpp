@@ -45,7 +45,7 @@ int main(int argc, char** argv)
         }  
     }
 
-    CPU cpu(&memory, disk_filenames);
+    CPU cpu(memory, disk_filenames);
 
     cpu.boot();
     if (debug_mode_on)

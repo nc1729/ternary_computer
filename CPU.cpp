@@ -1,5 +1,6 @@
 #include "CPU.h"
 #include "Console.h"
+#include "FPU.h"
 #include <vector>
 #include <string>
 #include <array>
@@ -7,9 +8,9 @@
 #include <iostream>
 #include <stdexcept>
 
-CPU::CPU(Memory<19683>* memory, std::vector<std::string>& disknames)
+CPU::CPU(Memory<19683>& memory, std::vector<std::string>& disknames)
 {
-	_memory = *memory;
+	_memory = memory;
 	_disknames = disknames;
 	_console = Console();
 	_clock = 0;
@@ -43,7 +44,7 @@ void CPU::fetch()
 	_instr = _memory[_i_ptr];
 }
 
-void CPU::execute()
+void CPU::decode_and_execute()
 {
 	std::string instruction = Tryte::septavingt_string(_instr);
 	char first = instruction[0];
@@ -1318,14 +1319,14 @@ void CPU::run()
 	while (_on)
 	{
 		fetch();
-		execute();
+		decode_and_execute();
 		_clock += 1;
 	}
 }
 void CPU::step()
 {
 	fetch();
-	execute();
+	decode_and_execute();
 	_clock += 1;
 }
 bool CPU::is_on()

@@ -4,6 +4,8 @@
 #include "Memory.h"
 #include "Trint.h"
 #include "Console.h"
+#include "FPU.h"
+
 class CPU
 {
 private:
@@ -41,7 +43,9 @@ private:
 		{'h', &_i[0]}, {'i', &_i[1]}, {'j', &_i[2]}, {'k', &_j[0]}, {'l', &_j[1]}, {'m', &_j[2]}};
 
 	std::array<Trint<3>*, 9> trint_regs = { &_a, &_b, &_c, &_d, &_e, &_g, &_h, &_i, &_j };
-	
+
+	// float processing unit (contains float registers)
+	FPU _FPU = FPU(_memory, _console);
 
 	// instruction pointer
 	Tryte _i_ptr;
@@ -63,10 +67,10 @@ private:
 	// stored_interrupt (3 trits) | current_interrupt (3 trits) | overflow | carry | compare
 	Tryte _flags;
 
-	// decode the Tryte at the instruction pointer and set it as current instruction
+	// fetch the Tryte at the instruction pointer and set it as current instruction
 	void fetch();
-	// execute current instruction
-	void execute();
+	// decode the current instruction and execute it
+	void decode_and_execute();
 
 	/*
 	OPERATIONS
@@ -319,7 +323,7 @@ private:
 
 
 public:
-	CPU(Memory<19683>* memory, std::vector<std::string>& disk_names);
+	CPU(Memory<19683>& memory, std::vector<std::string>& disk_names);
 	void boot();
 	void run();
 	void step();
