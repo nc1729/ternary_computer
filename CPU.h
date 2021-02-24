@@ -44,9 +44,6 @@ private:
 
 	std::array<Trint<3>*, 9> trint_regs = { &_a, &_b, &_c, &_d, &_e, &_g, &_h, &_i, &_j };
 
-	// float processing unit (contains float registers)
-	FPU _FPU = FPU(_memory, _console);
-
 	// instruction pointer
 	Tryte _i_ptr;
 
@@ -66,6 +63,9 @@ private:
 	// layout:
 	// stored_interrupt (3 trits) | current_interrupt (3 trits) | overflow | carry | compare
 	Tryte _flags;
+
+	// float processing unit (contains float registers)
+	FPU _FPU = FPU(_memory, _console, _flags, _i_ptr, _s_ptr);
 
 	// fetch the Tryte at the instruction pointer and set it as current instruction
 	void fetch();
@@ -108,17 +108,22 @@ private:
 	// Fill a Tryte/Trint register value with some chars from the console
 	void tell_tryte(Tryte& a);
 	void tell_trint(Trint<3>& a);
-	// PEEK A
-	// Copy top element on stack to register, without popping it off.
-	void peek_tryte(Tryte& a);
-	void peek_trint(Trint<3>& a);
 	// FILL $X, n, k
 	// Fill the trytes $X, $X+1, ..., $X+n-1 with value k.
 	void fill();
 	// MNT n
 	// Mount the nth device. All addresses will be relative to device n.
 	void mount(size_t n);
-	// PUSH X
+	
+
+	/*
+	stack management
+	*/
+    // PEEK A
+	// Copy top element on stack to register, without popping it off.
+	void peek_tryte(Tryte& a);
+	void peek_trint(Trint<3>& a);
+    // PUSH X
 	// Pushes register X (one tryte or three) onto the stack, and increments the stack pointer accordingly
 	void push_tryte(Tryte& a);
 	void push_trint(Trint<3>& a);
@@ -139,7 +144,7 @@ private:
 	void set_tryte_to_num(Tryte& a);
 	void set_tryte_to_addr(Tryte& a);
 	void set_tryte(Tryte& a, Tryte& y);
-	// SET A, $X or n or Y)
+	// SET A, ($X, n, Y)
 	// set Trint register A to contents of address {X, X+1, X+2} (or number n, or register Y)
 	void set_trint_to_num(Trint<3>& a);
 	void set_trint_to_addr(Trint<3>& a);
@@ -173,7 +178,7 @@ private:
 	void check_priority();
 
 	/*
-	arithmetic operations
+	integer arithmetic operations
 	*/
 	// FLIP X
 	// Flip the sign of the contents of register X
@@ -229,7 +234,6 @@ private:
 	// SHR X, n
 	// shift the trint X right by n trits
 	void shift_trint_right(Trint<3>& x);
-	
 
 	/* 
 	comparison

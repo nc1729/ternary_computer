@@ -78,7 +78,7 @@ public:
 		}
 
 	}
-	Trint(Tryte& tryte)
+	Trint(Tryte const& tryte)
 	{
 		for (size_t i = 0; i < n; i++)
 		{
@@ -87,7 +87,7 @@ public:
 		_data[n - 1] = tryte;
 	}
 	template <size_t m>
-	Trint(Trint<m>& trint)
+	Trint(Trint<m> const& trint)
 	{
 		if (m < n)
 		{
@@ -116,6 +116,14 @@ public:
 		}
 	}
 	Trint(std::array<Tryte, n>& tryte_array)
+	{
+		for (size_t i = 0; i < n; i++)
+		{
+			_data[i] = tryte_array[i];
+		}
+	}
+	// for constructing from rvalue references
+	Trint(std::array<Tryte, n>&& tryte_array)
 	{
 		for (size_t i = 0; i < n; i++)
 		{
@@ -467,7 +475,7 @@ public:
 		}
 		return os;
 	}
-	friend std::istream& operator>>(std::istream& is, Trint<n> const& trint)
+	friend std::istream& operator>>(std::istream& is, Trint<n>& trint)
 	{
 		for (size_t i = 0; i < n; i++)
 		{

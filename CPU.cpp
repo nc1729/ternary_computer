@@ -336,6 +336,22 @@ void CPU::decode_and_execute()
 
 		case 'f':
 			// fXY - floating point operations
+			// pass instruction to FPU - FPU will decode and execute the instruction
+			_FPU.handle_instr(instruction);
+			if (_FPU.error)
+			{
+				halt_and_catch_fire();
+			}
+			break;
+		
+		case 'g':
+			// gXY - floating point operations
+			// pass instruction to FPU - FPU will decode and execute the instruction
+			_FPU.handle_instr(instruction);
+			if (_FPU.error)
+			{
+				halt_and_catch_fire();
+			}
 			break;
 
 		case 'F':
@@ -591,10 +607,10 @@ void CPU::write_tryte(Tryte& x)
 }
 void CPU::write_trint(Trint<3>& x)
 {
-	Tryte& add_y = _memory[_i_ptr + 1];
-	_memory[add_y] = x[0];
-	_memory[add_y + 1] = x[1];
-	_memory[add_y + 2] = x[2];
+	Tryte& add_x = _memory[_i_ptr + 1];
+	_memory[add_x] = x[0];
+	_memory[add_x + 1] = x[1];
+	_memory[add_x + 2] = x[2];
 	_i_ptr += 2;
 }
 void CPU::load()

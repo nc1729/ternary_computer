@@ -9,6 +9,9 @@ tryte_registers = {"A0": "M", "A1": "L", "A2": "K", "B0": "J",
 trint_registers = {"A": "D", "B": "C", "C": "B", "D": "A", 
     "E": "0", "G": "a", "H": "b", "I": "c", "J": "d"}
 trint_register_names = "ABCDEGHIJ"
+float_registers = {"F0": "D", "F1": "C", "F2": "B", "F3": "A", "F4": "0",
+"F5": "a", "F6": "b", "F7": "c", "F8": "d"}
+float_register_names = ["F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8"]
 
 septavingt_chars = "MLKJIHGFEDCBA0abcdefghijklm"
 
@@ -28,6 +31,9 @@ def arg_is_tryte_reg(arg):
 
 def arg_is_trint_reg(arg):
     return arg in trint_registers
+
+def arg_is_float_reg(arg):
+    return arg in float_registers
 
 def arg_is_addr(arg):
     if arg[0] == "$":
@@ -78,11 +84,21 @@ def arg_is_positive_large_value(arg):
         return False
     return int(arg) > 0
 
+def arg_is_float(arg):
+    try:
+        float(arg)
+    except ValueError:
+        return False
+    return True
+
 def tryte_reg_to_opcode(opcode_start, reg):
     return opcode_start + tryte_registers[reg]
 
 def trint_reg_to_opcode(opcode_start, reg):
     return opcode_start + trint_registers[reg]
+
+def float_reg_to_opcode(opcode_start, reg):
+    return opcode_start + float_registers[reg]
 
 def short_to_opcode(opcode_start, short):
     return opcode_start + septavingt_chars[int(short)]
@@ -135,6 +151,27 @@ def signed_trint_value_to_trint(arg):
         output_string += septavingt_chars[13 + remainder]
     output_string = output_string[::-1]
     return [output_string[:3], output_string[3:6], output_string[6:9]]
+
+def float_to_tfloat(arg):
+    d = float(arg)
+    # calculate exponent
+    exponent = 0
+    if d > 0:
+        while d > 1.5:
+            d = d / 3
+            exponent += 1
+        while d < 0.5:
+            d = d * 3
+            exponent -= 1
+    elif d < 0:
+        while d < -1.5:
+            d = d / 3
+            exponent -= 1
+    exponent_tryte = signed_value_to_tryte(exponent)
+
+    # calculate mantissa from remains of d
+    mantissa_trytes = signed_trint_value_to_trint(round(d * (3**18)))[:2]
+    return [exponent_tryte, mantissa_trytes[0], mantissa_trytes[1]]
 
 ## Compilation functions
 # 0 arguments
@@ -240,6 +277,9 @@ def PEEK(statement):
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("bm", statement[1])
         return [opcode]
+    elif arg_is_float_reg(statement[1]):
+        opcode = float_reg_to_opcode("gl", statement[1])
+        return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
@@ -251,6 +291,9 @@ def PUSH(statement):
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("ba", statement[1])
         return [opcode]
+    elif arg_is_float_reg(statement[1]):
+        opcode = float_reg_to_opcode("gb", statement[1])
+        return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
@@ -261,6 +304,9 @@ def POP(statement):
         return [opcode]
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("bb", statement[1])
+        return [opcode]
+    elif arg_is_float_reg(statement[1]):
+        opcode = float_reg_to_opcode("gB", statement[1])
         return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
@@ -281,6 +327,9 @@ def SHOW(statement):
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("aa", statement[1])
         return [opcode]
+    elif arg_is_float_reg(statement[1]):
+        opcode = float_reg_to_opcode("ga", statement[1])
+        return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
@@ -291,6 +340,9 @@ def TELL(statement):
         return [opcode]
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("ab", statement[1])
+        return [opcode]
+    elif arg_is_float_reg(statement[1]):
+        opcode = float_reg_to_opcode("gA", statement[1])
         return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
@@ -325,6 +377,9 @@ def FLIP(statement):
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("kf", statement[1])
         return [opcode]
+    elif arg_is_float_reg(statement[1]):
+        opcode = float_reg_to_opcode("gd", statement[1])
+        return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
@@ -335,6 +390,9 @@ def ABS(statement):
         return [opcode]
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("kA", statement[1])
+        return [opcode]
+    elif arg_is_float_reg(statement[1]):
+        opcode = float_reg_to_opcode("gD", statement[1])
         return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
@@ -421,6 +479,8 @@ def READ(statement):
         opcode = tryte_reg_to_opcode("aC", statement[2])
     elif arg_is_trint_reg(statement[2]):
         opcode = trint_reg_to_opcode("ac", statement[2])
+    elif arg_is_float_reg(statement[2]):
+        opcode = float_reg_to_opcode("gm", statement[2])
     else:
         print_error(statement[-1], "Argument {} in {} must be a valid register.".format(2, statement[0]))
     
@@ -432,6 +492,8 @@ def WRITE(statement):
         opcode = tryte_reg_to_opcode("aD", statement[1])
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("ad", statement[1])
+    elif arg_is_float_reg(statement[1]):
+        opcode = trint_reg_to_opcode("gM", statement[1])
     else:
         print_error(statement[-1], "Argument {} in {} must be a valid register.".format(1, statement[0]))
     if arg_is_addr(statement[2]):
@@ -481,6 +543,25 @@ def SET(statement):
             return [opcode, addr]
         else:
             print_error(statement[-1], "Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
+    elif arg_is_float_reg(statement[1]):
+        if arg_is_float_reg(statement[2]):
+            # SET Fx, Fy
+            reg1_pos = float_register_names.index(statement[1])
+            reg2_pos = float_register_names.index(statement[2])
+            num = 9 * reg1_pos + reg2_pos
+            opcode = signed_value_to_tryte(num - 4*81 - 40)
+            opcode = "f" + opcode[1:]
+            return [opcode]
+        elif arg_is_float(statement[2]):
+            # SET Fx, n
+            opcode = float_reg_to_opcode("gC", statement[1])
+            tfloat_list = float_to_tfloat(statement[2])
+            return [opcode] + tfloat_list
+        elif arg_is_addr(statement[2]):
+            # SET Fx, $Y
+            opcode = float_reg_to_opcode("gc", statement[1])
+            addr = statement[2][1:]
+            return [opcode, addr]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
@@ -514,6 +595,20 @@ def CMP(statement):
             return [opcode] + trint_list
         else:
             print_error(statement[-1], "Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
+    elif arg_is_float_reg(statement[1]):
+        if arg_is_float_reg(statement[2]):
+            # CMP Fx, Fy
+            reg1_pos = float_register_names.index(statement[1])
+            reg2_pos = float_register_names.index(statement[2])
+            num = 9 * reg1_pos + reg2_pos
+            opcode = signed_value_to_tryte(num - 3*81 - 40)
+            opcode = "f" + opcode[1:]
+            return [opcode]
+        elif arg_is_float(statement[2]):
+            # CMP Fx, n
+            opcode = float_reg_to_opcode("g0", statement[1])
+            tfloat_list = float_to_tfloat(statement[2])
+            return [opcode] + tfloat_list
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
@@ -545,6 +640,22 @@ def ADD(statement):
             opcode = trint_reg_to_opcode("ka", statement[1])
             trint_list = signed_trint_value_to_trint(statement[2])
             return [opcode] + trint_list
+        else:
+            print_error(statement[-1], "Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
+    elif arg_is_float_reg(statement[1]):
+        if arg_is_float_reg(statement[2]):
+            # ADD Fx, Fy
+            reg1_pos = float_register_names.index(statement[1])
+            reg2_pos = float_register_names.index(statement[2])
+            num = 9 * reg1_pos + reg2_pos
+            opcode = signed_value_to_tryte(num - 2*81 - 40)
+            opcode = "f" + opcode[1:]
+            return [opcode]
+        elif arg_is_float(statement[2]):
+            # ADD Fx, n
+            opcode = float_reg_to_opcode("ge", statement[1])
+            tfloat_list = float_to_tfloat(statement[2])
+            return [opcode] + tfloat_list
         else:
             print_error(statement[-1], "Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
     else:
@@ -580,6 +691,22 @@ def DIV(statement):
             return [opcode] + trint_list
         else:
             print_error(statement[-1], "Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
+    elif arg_is_float_reg(statement[1]):
+        if arg_is_float_reg(statement[2]):
+            # DIV Fx, Fy
+            reg1_pos = float_register_names.index(statement[1])
+            reg2_pos = float_register_names.index(statement[2])
+            num = 9 * reg1_pos + reg2_pos
+            opcode = signed_value_to_tryte(num - 0*81 - 40)
+            opcode = "f" + opcode[1:]
+            return [opcode]
+        elif arg_is_float(statement[2]):
+            # DIV Fx, n
+            opcode = float_reg_to_opcode("gg", statement[1])
+            tfloat_list = float_to_tfloat(statement[2])
+            return [opcode] + tfloat_list
+        else:
+            print_error(statement[-1], "Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
@@ -611,6 +738,22 @@ def MUL(statement):
             opcode = trint_reg_to_opcode("ke", statement[1])
             trint_list = signed_trint_value_to_trint(statement[2])
             return [opcode] + trint_list
+        else:
+            print_error(statement[-1], "Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
+    elif arg_is_float_reg(statement[1]):
+        if arg_is_float_reg(statement[2]):
+            # MUL Fx, Fy
+            reg1_pos = float_register_names.index(statement[1])
+            reg2_pos = float_register_names.index(statement[2])
+            num = 9 * reg1_pos + reg2_pos
+            opcode = signed_value_to_tryte(num - 1*81 - 40)
+            opcode = "f" + opcode[1:]
+            return [opcode]
+        elif arg_is_float(statement[2]):
+            # MUL Fx, n
+            opcode = float_reg_to_opcode("gf", statement[1])
+            tfloat_list = float_to_tfloat(statement[2])
+            return [opcode] + tfloat_list
         else:
             print_error(statement[-1], "Argument {} in {} statement must be a register, integer or address.".format(2, statement[0]))
     else:
@@ -733,6 +876,14 @@ def SWAP(statement):
             return [opcode]
         else:
             print_error(statement[-1], "Sizes of registers in {} statement must match.".format(statement[0]))
+    elif arg_is_float_reg(statement[1]):
+        if arg_is_float_reg(statement[2]):
+            reg1_pos = float_register_names.index(statement[1])
+            reg2_pos = float_register_names.index(statement[2])
+            num = 9 * reg1_pos + reg2_pos
+            opcode = signed_value_to_tryte(num + 4*81 - 40)
+            opcode = "f" + opcode[1:]
+            return [opcode]
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 

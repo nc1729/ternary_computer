@@ -21,7 +21,7 @@ CFLAGS = -Wall -Werror -Wextra
 #
 # Project files
 #
-SRCS = Tryte.cpp test.cpp main.cpp CPU.cpp Console.cpp
+SRCS = Tryte.cpp test.cpp main.cpp CPU.cpp Console.cpp Float.cpp FPU.cpp
 OBJS = $(SRCS:.cpp=.o)
 EXE = ternary_computer
 

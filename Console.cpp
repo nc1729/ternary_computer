@@ -4,6 +4,7 @@
 #include "Console.h"
 #include "Trint.h"
 #include "Tryte.h"
+#include "Float.h"
 
 Console& Console::operator<<(Tryte& t)
 {
@@ -13,6 +14,11 @@ Console& Console::operator<<(Tryte& t)
 Console& Console::operator<<(Trint<3>& trint)
 {
 	std::cout << process_trint(trint);
+	return *this;
+}
+Console& Console::operator<<(TFloat& tfloat)
+{
+	std::cout << process_float(tfloat);
 	return *this;
 }
 Console& Console::operator>>(char input)
@@ -60,4 +66,8 @@ int64_t Console::process_trint(Trint<3>& trint)
 {
 	return Trint<3>::get_int(trint);
 	
+}
+double Console::process_float(TFloat& tfloat)
+{
+	return TFloat::get_double(tfloat);
 }
