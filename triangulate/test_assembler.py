@@ -10,6 +10,9 @@ test_tryte_registers = {"A0": "M", "A1": "L", "A2": "K", "B0": "J",
 test_trint_registers = {"A": "D", "B": "C", "C": "B", "D": "A", 
     "E": "0", "G": "a", "H": "b", "I": "c", "J": "d"}
 test_trint_register_names = "ABCDEGHIJ"
+test_float_registers = {"F0": "D", "F1": "C", "F2": "B", "F3": "A", "F4": "0",
+"F5": "a", "F6": "b", "F7": "c", "F8": "d"}
+test_float_register_names = ["F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8"]
 test_septavingt_chars = "MLKJIHGFEDCBA0abcdefghijklm"
 
 def test_signed_value_to_tryte():
@@ -18,6 +21,14 @@ def test_signed_value_to_tryte():
     assert(test_output == expected_output)
     expected_output = "d0A"
     test_output = handle_instr.signed_value_to_tryte(2915)
+    assert(test_output == expected_output)
+
+def test_float_to_tfloat():
+    expected_output = ["000", "i00", "000"]
+    test_output = handle_instr.float_to_tfloat(1.0)
+    assert(test_output == expected_output)
+    expected_output = ["00a", "IKM", "icK"]
+    test_output = handle_instr.float_to_tfloat('-3.141592653589')
     assert(test_output == expected_output)
 
 def test_HALT():
@@ -92,6 +103,10 @@ def test_PEEK():
         expected_output = [["bm" + test_trint_registers[trint]], 1]
         test_output = assemble.assemble_instr(["PEEK", trint, 7])
         assert(test_output == expected_output)
+    for tfloat in test_float_registers:
+        expected_output = [["gl" + test_float_registers[tfloat]], 1]
+        test_output = assemble.assemble_instr(["PEEK", tfloat, 7])
+        assert(test_output == expected_output)
 
 def test_PUSH():
     for tryte in test_tryte_registers:
@@ -102,6 +117,10 @@ def test_PUSH():
         expected_output = [["ba" + test_trint_registers[trint]], 1]
         test_output = assemble.assemble_instr(["PUSH", trint, 7])
         assert(test_output == expected_output)
+    for tfloat in test_float_registers:
+        expected_output = [["gb" + test_float_registers[tfloat]], 1]
+        test_output = assemble.assemble_instr(["PUSH", tfloat, 7])
+        assert(test_output == expected_output)
 
 def test_POP():
     for tryte in test_tryte_registers:
@@ -111,6 +130,10 @@ def test_POP():
     for trint in test_trint_registers:
         expected_output = [["bb" + test_trint_registers[trint]], 1]
         test_output = assemble.assemble_instr(["POP", trint, 7])
+        assert(test_output == expected_output)
+    for tfloat in test_float_registers:
+        expected_output = [["gB" + test_float_registers[tfloat]], 1]
+        test_output = assemble.assemble_instr(["POP", tfloat, 7])
         assert(test_output == expected_output)
 
 def test_WHERE():
@@ -128,6 +151,10 @@ def test_SHOW():
         expected_output = [["aa" + test_trint_registers[trint]], 1]
         test_output = assemble.assemble_instr(["SHOW", trint, 7])
         assert(test_output == expected_output)
+    for tfloat in test_float_registers:
+        expected_output = [["ga" + test_float_registers[tfloat]], 1]
+        test_output = assemble.assemble_instr(["SHOW", tfloat, 7])
+        assert(test_output == expected_output)
 
 def test_TELL():
     for tryte in test_tryte_registers:
@@ -137,6 +164,10 @@ def test_TELL():
     for trint in test_trint_registers:
         expected_output = [["ab" + test_trint_registers[trint]], 1]
         test_output = assemble.assemble_instr(["TELL", trint, 7])
+        assert(test_output == expected_output)
+    for tfloat in test_float_registers:
+        expected_output = [["gA" + test_float_registers[tfloat]], 1]
+        test_output = assemble.assemble_instr(["TELL", tfloat, 7])
         assert(test_output == expected_output)
     
 def test_INC():
@@ -168,6 +199,10 @@ def test_FLIP():
         expected_output = [["kf" + test_trint_registers[trint]], 1]
         test_output = assemble.assemble_instr(["FLIP", trint, 7])
         assert(test_output == expected_output)
+    for tfloat in test_float_registers:
+        expected_output = [["gd" + test_float_registers[tfloat]], 1]
+        test_output = assemble.assemble_instr(["FLIP", tfloat, 7])
+        assert(test_output == expected_output)
 
 def test_ABS():
     for tryte in test_tryte_registers:
@@ -177,6 +212,10 @@ def test_ABS():
     for trint in test_trint_registers:
         expected_output = [["kA" + test_trint_registers[trint]], 1]
         test_output = assemble.assemble_instr(["ABS", trint, 7])
+        assert(test_output == expected_output)
+    for tfloat in test_float_registers:
+        expected_output = [["gD" + test_float_registers[tfloat]], 1]
+        test_output = assemble.assemble_instr(["ABS", tfloat, 7])
         assert(test_output == expected_output)
 
 def test_NOT():
@@ -232,6 +271,10 @@ def test_READ():
         expected_output = [["ac" + test_trint_registers[trint], "DDD"], 2]
         test_output = assemble.assemble_instr(["READ", "$DDD", trint, 5])
         assert(test_output == expected_output)
+    for tfloat in test_float_registers:
+        expected_output = [["gm" + test_float_registers[tfloat], "DDD"], 2]
+        test_output = assemble.assemble_instr(["READ", "$DDD", tfloat, 7])
+        assert(test_output == expected_output)
 
 def test_WRITE():
     for tryte in test_tryte_registers:
@@ -241,6 +284,10 @@ def test_WRITE():
     for trint in test_trint_registers:
         expected_output = [["ad" + test_trint_registers[trint], "DDD"], 2]
         test_output = assemble.assemble_instr(["WRITE", trint, "$DDD", 5])
+        assert(test_output == expected_output)
+    for tfloat in test_float_registers:
+        expected_output = [["gM" + test_float_registers[tfloat], "DDD"], 2]
+        test_output = assemble.assemble_instr(["WRITE", tfloat, "$DDD", 7])
         assert(test_output == expected_output)
 
 def test_SET_trytes():
@@ -286,6 +333,30 @@ def test_SET_trint_to_addr():
         test_output = assemble.assemble_instr(["SET", trint, "$DDD", 37])
         assert(test_output == expected_output)
 
+def test_SET_floats():
+    for tfloat1 in test_float_registers:
+        for tfloat2 in test_float_registers:
+            reg1_pos = test_float_register_names.index(tfloat1)
+            reg2_pos = test_float_register_names.index(tfloat2)
+            num = 9 * reg1_pos + reg2_pos
+            opcode = handle_instr.signed_value_to_tryte(num - 4*81 - 40)
+            opcode = "f" + opcode[1:]
+            expected_output = [[opcode], 1]
+            test_output = assemble.assemble_instr(["SET", tfloat1, tfloat2, 289])
+            assert(test_output == expected_output)
+
+def test_SET_float_to_num():
+    for tfloat in test_float_registers:
+        expected_output = [["gC" + test_float_registers[tfloat], "00b", "e00", "000"], 4]
+        test_output = assemble.assemble_instr(["SET", tfloat, 5.0, 23])
+        assert(test_output == expected_output)
+
+def test_SET_float_to_addr():
+    for tfloat in test_float_registers:
+        expected_output = [["gc" + test_float_registers[tfloat], "DDD"], 2]
+        test_output = assemble.assemble_instr(["SET", tfloat, "$DDD", 37])
+        assert(test_output == expected_output)
+
 def test_CMP_trytes():
     for tryte1 in test_tryte_registers:
         for tryte2 in test_tryte_registers:
@@ -315,6 +386,24 @@ def test_CMP_trint_with_num():
     for trint in test_trint_registers:
         expected_output = [["kc" + test_trint_registers[trint], "000", "0bC", "EGa"], 4]
         test_output = assemble.assemble_instr(["CMP", trint, 1000000, 23])
+        assert(test_output == expected_output)
+
+def test_CMP_floats():
+    for tfloat1 in test_float_registers:
+        for tfloat2 in test_float_registers:
+            reg1_pos = test_float_register_names.index(tfloat1)
+            reg2_pos = test_float_register_names.index(tfloat2)
+            num = 9 * reg1_pos + reg2_pos
+            opcode = handle_instr.signed_value_to_tryte(num - 3*81 - 40)
+            opcode = "f" + opcode[1:]
+            expected_output = [[opcode], 1]
+            test_output = assemble.assemble_instr(["CMP", tfloat1, tfloat2, 289])
+            assert(test_output == expected_output)
+
+def test_CMP_float_with_num():
+    for tfloat in test_float_registers:
+        expected_output = [["g0" + test_float_registers[tfloat], "00b", "e00", "000"], 4]
+        test_output = assemble.assemble_instr(["CMP", tfloat, 5.0, 23])
         assert(test_output == expected_output)
 
 def test_ADD_trytes():
@@ -348,6 +437,24 @@ def test_ADD_trint_with_num():
         test_output = assemble.assemble_instr(["ADD", trint, 1000000, 23])
         assert(test_output == expected_output)
 
+def test_ADD_floats():
+    for tfloat1 in test_float_registers:
+        for tfloat2 in test_float_registers:
+            reg1_pos = test_float_register_names.index(tfloat1)
+            reg2_pos = test_float_register_names.index(tfloat2)
+            num = 9 * reg1_pos + reg2_pos
+            opcode = handle_instr.signed_value_to_tryte(num - 2*81 - 40)
+            opcode = "f" + opcode[1:]
+            expected_output = [[opcode], 1]
+            test_output = assemble.assemble_instr(["ADD", tfloat1, tfloat2, 289])
+            assert(test_output == expected_output)
+
+def test_ADD_float_to_num():
+    for tfloat in test_float_registers:
+        expected_output = [["ge" + test_float_registers[tfloat], "00b", "e00", "000"], 4]
+        test_output = assemble.assemble_instr(["ADD", tfloat, 5.0, 23])
+        assert(test_output == expected_output)
+
 def test_MUL_trytes():
     for tryte1 in test_tryte_registers:
         for tryte2 in test_tryte_registers:
@@ -379,6 +486,24 @@ def test_MUL_trint_with_num():
         test_output = assemble.assemble_instr(["MUL", trint, 1000000, 23])
         assert(test_output == expected_output)
 
+def test_MUL_floats():
+    for tfloat1 in test_float_registers:
+        for tfloat2 in test_float_registers:
+            reg1_pos = test_float_register_names.index(tfloat1)
+            reg2_pos = test_float_register_names.index(tfloat2)
+            num = 9 * reg1_pos + reg2_pos
+            opcode = handle_instr.signed_value_to_tryte(num - 1*81 - 40)
+            opcode = "f" + opcode[1:]
+            expected_output = [[opcode], 1]
+            test_output = assemble.assemble_instr(["MUL", tfloat1, tfloat2, 289])
+            assert(test_output == expected_output)
+
+def test_MUL_float_by_num():
+    for tfloat in test_float_registers:
+        expected_output = [["gf" + test_float_registers[tfloat], "00b", "e00", "000"], 4]
+        test_output = assemble.assemble_instr(["MUL", tfloat, 5.0, 23])
+        assert(test_output == expected_output)
+
 def test_DIV_trytes():
     for tryte1 in test_tryte_registers:
         for tryte2 in test_tryte_registers:
@@ -408,6 +533,24 @@ def test_DIV_trint_with_num():
     for trint in test_trint_registers:
         expected_output = [["kd" + test_trint_registers[trint], "000", "0bC", "EGa"], 4]
         test_output = assemble.assemble_instr(["DIV", trint, 1000000, 23])
+        assert(test_output == expected_output)
+
+def test_DIV_floats():
+    for tfloat1 in test_float_registers:
+        for tfloat2 in test_float_registers:
+            reg1_pos = test_float_register_names.index(tfloat1)
+            reg2_pos = test_float_register_names.index(tfloat2)
+            num = 9 * reg1_pos + reg2_pos
+            opcode = handle_instr.signed_value_to_tryte(num - 0*81 - 40)
+            opcode = "f" + opcode[1:]
+            expected_output = [[opcode], 1]
+            test_output = assemble.assemble_instr(["DIV", tfloat1, tfloat2, 289])
+            assert(test_output == expected_output)
+
+def test_DIV_float_by_num():
+    for tfloat in test_float_registers:
+        expected_output = [["gg" + test_float_registers[tfloat], "00b", "e00", "000"], 4]
+        test_output = assemble.assemble_instr(["DIV", tfloat, 5.0, 23])
         assert(test_output == expected_output)
 
 def test_AND_trytes():

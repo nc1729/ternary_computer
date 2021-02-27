@@ -166,11 +166,14 @@ def float_to_tfloat(arg):
     elif d < 0:
         while d < -1.5:
             d = d / 3
+            exponent += 1
+        while d > -0.5:
+            d = d * 3
             exponent -= 1
     exponent_tryte = signed_value_to_tryte(exponent)
 
     # calculate mantissa from remains of d
-    mantissa_trytes = signed_trint_value_to_trint(round(d * (3**18)))[:2]
+    mantissa_trytes = signed_trint_value_to_trint(round(d * (3**17)))[1:]
     return [exponent_tryte, mantissa_trytes[0], mantissa_trytes[1]]
 
 ## Compilation functions
@@ -493,7 +496,7 @@ def WRITE(statement):
     elif arg_is_trint_reg(statement[1]):
         opcode = trint_reg_to_opcode("ad", statement[1])
     elif arg_is_float_reg(statement[1]):
-        opcode = trint_reg_to_opcode("gM", statement[1])
+        opcode = float_reg_to_opcode("gM", statement[1])
     else:
         print_error(statement[-1], "Argument {} in {} must be a valid register.".format(1, statement[0]))
     if arg_is_addr(statement[2]):
