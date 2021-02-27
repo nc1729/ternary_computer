@@ -7,16 +7,35 @@
 class Console
 {
 private:
-	// routine for decoding raw Trytes into pairs of ASCII characters
-	// Tryte t = (128a + b - 9841), where 0 <= a, b < 128 is the basic ASCII char set
-	// pad spare values with b = 0
-	std::string process_tryte(Tryte& t);
-	int64_t process_trint(Trint<3>& trint);
-	double process_float(TFloat& tfloat);
+	enum class OutputMode {
+		// raw: all trytes sent to console will be printed in septavingtesmal form
+		raw,
+		// ternary: all trytes sent to console will be printed in ternary form
+		ternary,
+		// number: Trytes, Trints and TFloats will be printed in their numerical form
+		number,
+		// dense_text: each Tryte sent to console will be converted into two ASCII chars and printed
+		dense_text,
+		// wide_text: each Tryte will be converted to a single char and printed
+		wide_text,
+		// graphics: to be implemented later, convert sets of Trytes to ANSI colour codes etc
+		graphics
+	} _output_mode;
 
 public:
+	Console();
 	Console& operator<<(Tryte& t);
 	Console& operator<<(Trint<3>& trint);
 	Console& operator<<(TFloat& tfloat);
+	Console& operator<<(char c);
+	Console& operator<<(std::string out_string);
 	Console& operator>>(char input);
+
+	// output mode
+	void raw_mode();
+	void ternary_mode();
+	void number_mode();
+	void dense_text_mode();
+	void wide_text_mode();
+	void graphics_mode();
 };

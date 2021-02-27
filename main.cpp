@@ -50,14 +50,26 @@ int main(int argc, char** argv)
     cpu.boot();
     if (debug_mode_on)
     {
+        std::cout << "Starting program.\n";
+
         while (cpu.is_on())
         {
-            cpu.step();
-            char c = std::cin.get();
-            if (c == 'd')
+            cpu.dump();
+            std::cout << "Press n for next instruction or q to quit.\n";
+            char c;
+            while (std::cin >> c)
             {
-                cpu.dump();
-            }            
+                if (c == 'n')
+                {
+                    cpu.step();
+                    break;
+                }
+                else if (c == 'q')
+                {
+                    cpu.switch_off();
+                    break;
+                }
+            }         
         }
         
 

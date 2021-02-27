@@ -1,20 +1,13 @@
 #include <array>
+#include <iostream>
 #include "FPU.h"
 #include "Float.h"
 #include "Console.h"
 #include "Memory.h"
 
-FPU::FPU(Memory<19683>& memory, Console& console, Tryte& flags, Tryte& i_ptr, Tryte& s_ptr)
+FPU::FPU(Memory<19683>& memory, Console& console, Tryte& flags, Tryte& i_ptr, Tryte& s_ptr) : 
+_memory{memory}, _console{console}, _flags{flags}, _i_ptr{i_ptr}, _s_ptr{s_ptr}
 {
-    // FPU has access to memory and console, and CPU flags
-    _memory = memory;
-    _console = console;
-    _flags = flags;
-
-    // FPU has access to instruction and stack pointers
-    _i_ptr = i_ptr;
-    _s_ptr = s_ptr;
-
     // zero all registers
     for (auto& reg : float_regs)
     {
@@ -145,6 +138,14 @@ void FPU::handle_instr(Tryte instruction)
     {
         halt_and_catch_fire();
     }      
+}
+void FPU::dump()
+{
+    _console.number_mode();
+    _console << "Float registers:\n";
+    _console << "f0 = " << _f0 << " f1 = " << _f1 << " f2 = " << _f2 << '\n';
+    _console << "f3 = " << _f3 << " f4 = " << _f4 << " f5 = " << _f5 << '\n';
+    _console << "f6 = " << _f6 << " f7 = " << _f7 << " f8 = " << _f8 << '\n';
 }
 void FPU::reset()
 {

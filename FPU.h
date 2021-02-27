@@ -8,6 +8,7 @@ class FPU
 {
 private:
     // internal float registers
+    TFloat _f0;
     TFloat _f1;
     TFloat _f2;
     TFloat _f3;
@@ -16,19 +17,18 @@ private:
     TFloat _f6;
     TFloat _f7;
     TFloat _f8;
-    TFloat _f9;
-    std::array<TFloat*, 9> float_regs = {&_f1, &_f2, &_f3, &_f4, &_f5, &_f6, &_f7, &_f8, &_f9};
+    std::array<TFloat*, 9> float_regs = {&_f0, &_f1, &_f2, &_f3, &_f4, &_f5, &_f6, &_f7, &_f8};
 
-    // access to console
-    Console _console;
     // access to main memory
-    Memory<19683> _memory;
+    Memory<19683>& _memory;
+    // access to console
+    Console& _console;
     // access to CPU flags
-    Tryte _flags;
+    Tryte& _flags;
 
     // access to instruction and stack pointers
-    Tryte _i_ptr;
-    Tryte _s_ptr;
+    Tryte& _i_ptr;
+    Tryte& _s_ptr;
 
     /*
     input/output
@@ -111,6 +111,8 @@ public:
     bool error;
     // instruction handler
     void handle_instr(Tryte instruction);
+    // dump (for CPU dump)
+    void dump();
     // reset - zeroes all registers, sets error flag to false, ready for new instruction
     void reset();
 };

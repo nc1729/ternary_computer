@@ -5,7 +5,6 @@
 #include <string>
 #include <array>
 #include <fstream>
-#include <iostream>
 #include <stdexcept>
 
 CPU::CPU(Memory<19683>& memory, std::vector<std::string>& disknames)
@@ -1345,35 +1344,31 @@ void CPU::step()
 	decode_and_execute();
 	_clock += 1;
 }
+void CPU::switch_off()
+{
+	_on = false;
+}
 bool CPU::is_on()
 {
 	return _on;
 }
 void CPU::dump()
 {
-	std::cout << "This instruction: " << _instr << '\n';
-	std::cout << "Registers:\n";
-	std::cout << "\na = ";
-	_console << _a;
-	std::cout << "\nb = ";
-	_console << _b;
-	std::cout << "\nc = ";
-	_console << _c;
-	std::cout << "\nd = ";
-	_console << _d;
-	std::cout << "\ne = ";
-	_console << _e;
-	std::cout << "\ng = ";
-	_console << _g;
-	std::cout << "\nh = ";
-	_console << _h;
-	std::cout << "\ni = ";
-	_console << _i;
-	std::cout << "\nj = ";
-	_console << _j;
-	std::cout << "\ni_ptr = " << _i_ptr << '\n';
-	std::cout << "\ns_ptr = " << _s_ptr << '\n';
-	std::cout << "Flags: " << _flags << '\n';
+	_console.raw_mode();
+	_console << "This instruction: " << _instr << '\n';
+	_console << "Integer registers:\n";
+	_console.number_mode();
+	_console << "a = " << _a << " b = " << _b << " c = " << _c << '\n';
+	_console << "d = " << _d << " e = " << _e << " g = " << _g << '\n';
+	_console << "h = " << _h << " i = " << _i << " j = " << _j << '\n';
+	_console.raw_mode();
+	_console << "i_ptr = " << _i_ptr << '\n';
+	_console << "s_ptr = " << _s_ptr << '\n';
+	_console.ternary_mode();
+	_console << "Flags: " << _flags << '\n';
+	_FPU.dump();
+	_console << '\n';
+	_console.raw_mode();
 }
 void CPU::set_interrupt_priority(int16_t n)
 {

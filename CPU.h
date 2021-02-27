@@ -331,6 +331,7 @@ public:
 	void boot();
 	void run();
 	void step();
+	void switch_off();
 	bool is_on();
 	void current_instr();
 	void dump();
