@@ -32,6 +32,7 @@ public:
 	Console& operator>>(char input);
 
 	// output mode
+	int16_t get_output_mode();
 	void raw_mode();
 	void ternary_mode();
 	void number_mode();

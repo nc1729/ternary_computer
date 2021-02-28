@@ -350,6 +350,32 @@ def TELL(statement):
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
 
+def DSET(statement):
+    arg_number_check(statement, 1)
+    if arg_is_short(statement[1]):
+        opcode = short_to_opcode("cm", statement[1])
+        return [opcode]
+    elif arg_is_tryte_reg(statement[1]):
+        opcode = tryte_reg_to_opcode("cA", statement[1])
+        return [opcode]
+    elif arg_is_trint_reg(statement[1]):
+        opcode = trint_reg_to_opcode("ca", statement[1])
+        return [opcode]
+    else:
+        print_error(statement[-1], 
+        "Argument {} in {} statement must be a valid register or an integer satisfying 0 <= n < 27.".format(1, statement[0]))
+
+def DGET(statement):
+    arg_number_check(statement, 1)
+    if arg_is_tryte_reg(statement[1]):
+        opcode = tryte_reg_to_opcode("cB", statement[1])
+        return [opcode]
+    elif arg_is_trint_reg(statement[1]):
+        opcode = trint_reg_to_opcode("cb", statement[1])
+        return [opcode]
+    else:
+        print_error(statement[-1], "Argument {} in {} statement must be a valid register.".format(1, statement[0]))
+
 def INC(statement):
     arg_number_check(statement, 1)
     if arg_is_tryte_reg(statement[1]):
@@ -438,7 +464,7 @@ def PRINT(statement):
     else:
         print_error(statement[-1], "Argument {} in {} statement must be an integer satisfying 0 <= x < 19683.".format(2, statement[0]))
     
-    return ["a00", addr, val]
+    return ["c00", addr, val]
 
 def SHL(statement):
     arg_number_check(statement, 2)
@@ -479,9 +505,9 @@ def READ(statement):
     else:
         print_error(statement[-1], "Argument {} in {} statement must be a valid address.".format(1, statement[0]))
     if arg_is_tryte_reg(statement[2]):
-        opcode = tryte_reg_to_opcode("aC", statement[2])
+        opcode = tryte_reg_to_opcode("aA", statement[2])
     elif arg_is_trint_reg(statement[2]):
-        opcode = trint_reg_to_opcode("ac", statement[2])
+        opcode = trint_reg_to_opcode("aa", statement[2])
     elif arg_is_float_reg(statement[2]):
         opcode = float_reg_to_opcode("gm", statement[2])
     else:
@@ -492,9 +518,9 @@ def READ(statement):
 def WRITE(statement):
     arg_number_check(statement, 2)
     if arg_is_tryte_reg(statement[1]):
-        opcode = tryte_reg_to_opcode("aD", statement[1])
+        opcode = tryte_reg_to_opcode("aB", statement[1])
     elif arg_is_trint_reg(statement[1]):
-        opcode = trint_reg_to_opcode("ad", statement[1])
+        opcode = trint_reg_to_opcode("ab", statement[1])
     elif arg_is_float_reg(statement[1]):
         opcode = float_reg_to_opcode("gM", statement[1])
     else:
@@ -973,14 +999,18 @@ def STRWRT(statement):
         char2 = input_str[2*i + 1]
         output_tryte_string.append(signed_value_to_tryte(128*ord(char1) + ord(char2) - 9841))
     
-    # generate list of instructions for print this string
+    # generate list of instructions for printing this string
     offset = 0
+    # PUSH D - store whatever is in D before this macro was called
+    output_instr_list += ["baA"]
     for tryte in output_tryte_string:
         # SET D2, n
         output_instr_list += ["KbD", tryte]
         # WRITE D2, $add1+offset
         output_instr_list += ["aDD", unsigned_value_to_tryte(add1_value + offset)]
         offset += 1
+    # POP D - recover original state of D
+    output_instr_list += ["bbA"]
 
     return output_instr_list
 
@@ -1007,10 +1037,20 @@ def STRPNT(statement):
     
     # now one by one send to register D2 and SHOW them to the console
     output_instr_list = []
+    # PUSH D - store whatever is in D before this macro was called
+    output_instr_list += ["baA"]
+    # DGET D1 - store the current display mode in D1
+    output_instr_list += ["cBC"]
+    # DSET 3 - set output mode to wide_text
+    output_instr_list += ["cmJ"]
     for tryte in output_tryte_string:
         # SET D2, n
         output_instr_list += ["KbD", tryte]
         # SHOW D2
         output_instr_list += ["aAD"]
+    # DSET D1 - restore original output mode
+    output_instr_list += ["cAC"]
+    # POP D - recover original state of D
+    output_instr_list += ["bbA"]
     
     return output_instr_list

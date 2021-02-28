@@ -177,7 +177,7 @@ void CPU::decode_and_execute()
 				break;
 
 			case 'm':
-				// 0mn - MOUNT n
+				// 0m - MOUNT n
 				mount(low_3 + 13);
 				break;
 
@@ -191,48 +191,23 @@ void CPU::decode_and_execute()
 			// aXX - input/output
 			switch (second)
 			{
-				case '0':
-					// a0 - PRINT $X, N
-					print();
-					break;
-
 				case 'A':
-					// aAX - SHOW X
-					show_tryte(*tryte_regs[third]);
-					break;
-
-				case 'a':
-					// aaX - SHOW X
-					show_trint(*trint_regs[low_2]);
-					break;
-
-				case 'B':
-					// aBX - TELL X
-					tell_tryte(*tryte_regs[third]);
-					break;
-
-				case 'b':
-					// abX - SHOW X
-					tell_trint(*trint_regs[low_2]);
-					break;
-
-				case 'C':
-					// aCY - READ $X, Y
+					// aAY - READ $X, Y
 					read_tryte(*tryte_regs[third]);
 					break;
 
-				case 'c':
-					// acY - READ $X, Y
+				case 'a':
+					// aaY - READ $X, Y
 					read_trint(*trint_regs[low_2]);
 					break;
 
-				case 'D':
-					// aDX - WRITE X, $Y
+				case 'B':
+					// aBX - WRITE X, $Y
 					write_tryte(*tryte_regs[third]);
 					break;
 
-				case 'd':
-					// adX - WRITE X, $Y
+				case 'b':
+					// abX - WRITE X, $Y
 					write_trint(*trint_regs[low_2]);
 					break;
 
@@ -254,7 +229,6 @@ void CPU::decode_and_execute()
 				default:
 					halt_and_catch_fire();
 					break;
-
 			}
 			break;
 
@@ -302,6 +276,53 @@ void CPU::decode_and_execute()
 					break;
 			}
 			break;
+		
+		case 'c':
+			// cXX - console management
+			switch (second)
+			{
+				case '0':
+					// c0 - PRINT $X, n
+					print();
+					break;
+				case 'a':
+					// caX - DSET X
+					set_display_mode(*trint_regs[low_2]);
+					break;
+				case 'A':
+					// cAX - DSET X
+					set_display_mode(*tryte_regs[third]);
+					break;
+				case 'b':
+					// cbX - DGET X
+					get_display_mode(*trint_regs[low_2]);
+					break;
+				case 'B':
+					// cBX - DGET X
+					get_display_mode(*tryte_regs[third]);
+					break;
+				case 'c':
+					// ccX - SHOW X
+					show_trint(*trint_regs[low_2]);
+					break;
+				case 'C':
+					// cCX - SHOW X
+					show_tryte(*tryte_regs[third]);
+					break;
+				case 'd':
+					// cdX - TELL X
+					tell_trint(*trint_regs[low_2]);
+					break;
+				case 'D':
+					// cDX - TELL X
+					tell_tryte(*tryte_regs[third]);
+					break;
+				case 'm':
+					// cmn - DSET n
+					set_display_mode(low_3 + 13);
+					break; 
+			}
+			break; 
 
 		case 'A':
 			// AXY - add trytes
@@ -740,6 +761,103 @@ void CPU::mount(size_t n)
 	{
 		throw std::runtime_error("Tried to mount a disk that doesn't exist.\n");
 	}
+	_i_ptr += 1;
+}
+void CPU::set_display_mode(Tryte& a)
+{
+	std::array<int16_t, 3> a_array = Tryte::septavingt_array(a);
+	int16_t last_digit = a_array[2] + 13;
+	switch (last_digit)
+	{
+		case 0:
+			_console.raw_mode();
+			break;
+		case 1:
+			_console.ternary_mode();
+			break;
+		case 2:
+			_console.number_mode();
+			break;
+		case 3:
+			_console.dense_text_mode();
+			break;
+		case 4:
+			_console.wide_text_mode();
+			break;
+		case 5:
+			_console.graphics_mode();
+			break;
+		default:
+			throw std::runtime_error("Unrecognised display mode.\n");
+			break;
+	}
+	_i_ptr += 2;
+}
+void CPU::set_display_mode(Trint<3>& a)
+{
+	int16_t last_digit = Tryte::septavingt_array(a[2])[2] + 13;
+	switch (last_digit)
+	{
+		case 0:
+			_console.raw_mode();
+			break;
+		case 1:
+			_console.ternary_mode();
+			break;
+		case 2:
+			_console.number_mode();
+			break;
+		case 3:
+			_console.dense_text_mode();
+			break;
+		case 4:
+			_console.wide_text_mode();
+			break;
+		case 5:
+			_console.graphics_mode();
+			break;
+		default:
+			throw std::runtime_error("Unrecognised display mode.\n");
+			break;
+	}
+	_i_ptr += 2;
+}
+void CPU::set_display_mode(size_t n)
+{
+	switch (n)
+	{
+		case 0:
+			_console.raw_mode();
+			break;
+		case 1:
+			_console.ternary_mode();
+			break;
+		case 2:
+			_console.number_mode();
+			break;
+		case 3:
+			_console.dense_text_mode();
+			break;
+		case 4:
+			_console.wide_text_mode();
+			break;
+		case 5:
+			_console.graphics_mode();
+			break;
+		default:
+			throw std::runtime_error("Unrecognised display mode.\n");
+			break;
+	}
+	_i_ptr += 1;
+}
+void CPU::get_display_mode(Tryte& a)
+{
+	a = _console.get_output_mode();
+	_i_ptr += 1;
+}
+void CPU::get_display_mode(Trint<3>& a)
+{
+	a = _console.get_output_mode();
 	_i_ptr += 1;
 }
 void CPU::push_tryte(Tryte& a)
@@ -1355,7 +1473,7 @@ bool CPU::is_on()
 void CPU::dump()
 {
 	_console.raw_mode();
-	_console << "This instruction: " << _instr << '\n';
+	_console << "Next instruction: " << _memory[_i_ptr] << '\n';
 	_console << "Integer registers:\n";
 	_console.number_mode();
 	_console << "a = " << _a << " b = " << _b << " c = " << _c << '\n';

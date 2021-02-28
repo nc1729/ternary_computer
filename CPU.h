@@ -97,6 +97,32 @@ private:
 	// SAVE $X, n, $Y
 	// Open device and copy n Trytes from memory ($X, $X+1, ... $X+n-1) onto device, starting at address Y.
 	void save();
+	// FILL $X, n, k
+	// Fill the trytes $X, $X+1, ..., $X+n-1 with value k.
+	void fill();
+	// MNT n
+	// Mount the nth device. All addresses will be relative to device n.
+	void mount(size_t n);
+
+	/*
+	console management
+	*/
+	// DSET (A, n)
+	// Set the display mode. 
+	// n = 0: raw
+	// n = 1: ternary
+	// n = 2: number
+	// n = 3: dense_text
+	// n = 4: wide_text
+	// n = 5: graphics
+	// if a register is input, only the last three ternary digits are used
+	void set_display_mode(Tryte& a);
+	void set_display_mode(Trint<3>& a);
+	void set_display_mode(size_t n);
+	// DGET A
+	// Get the display mode and put it in register A.
+	void get_display_mode(Tryte& a);
+	void get_display_mode(Trint<3>& a);
 	// PRINT $X, n
 	// Send n trytes, starting from $X in memory, to the console output.
 	void print();
@@ -108,13 +134,6 @@ private:
 	// Fill a Tryte/Trint register value with some chars from the console
 	void tell_tryte(Tryte& a);
 	void tell_trint(Trint<3>& a);
-	// FILL $X, n, k
-	// Fill the trytes $X, $X+1, ..., $X+n-1 with value k.
-	void fill();
-	// MNT n
-	// Mount the nth device. All addresses will be relative to device n.
-	void mount(size_t n);
-	
 
 	/*
 	stack management

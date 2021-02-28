@@ -155,7 +155,39 @@ Console& Console::operator>>(char input)
 		
 	return *this;
 }
-
+int16_t Console::get_output_mode()
+{
+	if (_output_mode == OutputMode::raw)
+	{
+		return 0;
+	}
+	else if (_output_mode == OutputMode::ternary)
+	{
+		return 1;
+	}
+	else if (_output_mode == OutputMode::number)
+	{
+		return 2;
+	}
+	else if (_output_mode == OutputMode::dense_text)
+	{
+		return 3;
+	}
+	else if (_output_mode == OutputMode::wide_text)
+	{
+		return 4;
+	}
+	else if (_output_mode == OutputMode::graphics)
+	{
+		return 5;
+	}
+	else
+	{
+		// this should never happen
+		return -1;
+	}
+	
+}
 void Console::raw_mode()
 {
 	_output_mode = OutputMode::raw;

@@ -169,6 +169,33 @@ def test_TELL():
         expected_output = [["gA" + test_float_registers[tfloat]], 1]
         test_output = assemble.assemble_instr(["TELL", tfloat, 7])
         assert(test_output == expected_output)
+
+def test_DSET_num():
+    possible_inputs = [str(i) for i in range(27)]
+    possible_outputs = ["cm" + test_septavingt_chars[i] for i in range(27)]
+    for j in range(27):
+        test_output = assemble.assemble_instr(['DSET', possible_inputs[j], 3])
+        assert(test_output == [[possible_outputs[j]], 1])
+
+def test_DSET():
+    for tryte in test_tryte_registers:
+        expected_output = [["cA" + test_tryte_registers[tryte]], 1]
+        test_output = assemble.assemble_instr(["DSET", tryte, 7])
+        assert(test_output == expected_output)
+    for trint in test_trint_registers:
+        expected_output = [["ca" + test_trint_registers[trint]], 1]
+        test_output = assemble.assemble_instr(["DSET", trint, 7])
+        assert(test_output == expected_output)
+
+def test_DGET():
+    for tryte in test_tryte_registers:
+        expected_output = [["cB" + test_tryte_registers[tryte]], 1]
+        test_output = assemble.assemble_instr(["DGET", tryte, 7])
+        assert(test_output == expected_output)
+    for trint in test_trint_registers:
+        expected_output = [["cb" + test_trint_registers[trint]], 1]
+        test_output = assemble.assemble_instr(["DGET", trint, 7])
+        assert(test_output == expected_output)
     
 def test_INC():
     for tryte in test_tryte_registers:
@@ -238,7 +265,7 @@ def test_SETINT():
         assert(test_output == expected_output)
 
 def test_PRINT():
-    expected_output = [["a00", "DDD", "MME"], 3]
+    expected_output = [["c00", "DDD", "MME"], 3]
     test_output = assemble.assemble_instr(["PRINT", "$DDD", "8", 9])
     assert(test_output == expected_output)
 
@@ -264,11 +291,11 @@ def test_SHR():
 
 def test_READ():
     for tryte in test_tryte_registers:
-        expected_output = [["aC" + test_tryte_registers[tryte], "DDD"], 2]
+        expected_output = [["aA" + test_tryte_registers[tryte], "DDD"], 2]
         test_output = assemble.assemble_instr(["READ", "$DDD", tryte, 5])
         assert(test_output == expected_output)
     for trint in test_trint_registers:
-        expected_output = [["ac" + test_trint_registers[trint], "DDD"], 2]
+        expected_output = [["aa" + test_trint_registers[trint], "DDD"], 2]
         test_output = assemble.assemble_instr(["READ", "$DDD", trint, 5])
         assert(test_output == expected_output)
     for tfloat in test_float_registers:
@@ -278,11 +305,11 @@ def test_READ():
 
 def test_WRITE():
     for tryte in test_tryte_registers:
-        expected_output = [["aD" + test_tryte_registers[tryte], "DDD"], 2]
+        expected_output = [["aB" + test_tryte_registers[tryte], "DDD"], 2]
         test_output = assemble.assemble_instr(["WRITE", tryte, "$DDD", 5])
         assert(test_output == expected_output)
     for trint in test_trint_registers:
-        expected_output = [["ad" + test_trint_registers[trint], "DDD"], 2]
+        expected_output = [["ab" + test_trint_registers[trint], "DDD"], 2]
         test_output = assemble.assemble_instr(["WRITE", trint, "$DDD", 5])
         assert(test_output == expected_output)
     for tfloat in test_float_registers:
