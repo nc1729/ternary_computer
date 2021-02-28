@@ -325,10 +325,10 @@ def WHERE(statement):
 def SHOW(statement):
     arg_number_check(statement, 1)
     if arg_is_tryte_reg(statement[1]):
-        opcode = tryte_reg_to_opcode("aA", statement[1])
+        opcode = tryte_reg_to_opcode("cC", statement[1])
         return [opcode]
     elif arg_is_trint_reg(statement[1]):
-        opcode = trint_reg_to_opcode("aa", statement[1])
+        opcode = trint_reg_to_opcode("cc", statement[1])
         return [opcode]
     elif arg_is_float_reg(statement[1]):
         opcode = float_reg_to_opcode("ga", statement[1])
@@ -339,10 +339,10 @@ def SHOW(statement):
 def TELL(statement):
     arg_number_check(statement, 1)
     if arg_is_tryte_reg(statement[1]):
-        opcode = tryte_reg_to_opcode("aB", statement[1])
+        opcode = tryte_reg_to_opcode("cD", statement[1])
         return [opcode]
     elif arg_is_trint_reg(statement[1]):
-        opcode = trint_reg_to_opcode("ab", statement[1])
+        opcode = trint_reg_to_opcode("cd", statement[1])
         return [opcode]
     elif arg_is_float_reg(statement[1]):
         opcode = float_reg_to_opcode("gA", statement[1])
@@ -982,7 +982,7 @@ def STRWRT(statement):
     add1_value = (729 * (septavingt_chars.find(add1[0]) - 13) 
     + 27 * (septavingt_chars.find(add1[1]) - 13) 
     + (septavingt_chars.find(add1[2]) - 13))
-    output_tryte_string = []
+    output_trytes = []
     output_instr_list = []
     if (len(input_str) % 2 == 1):
         # if input_str has odd length, pad it with zero
@@ -993,24 +993,27 @@ def STRWRT(statement):
         new_input_str = input_str + '\0\0'
         input_str = new_input_str
     
-    # convert string into list of trytes
+    # convert string into list of tryte values
     for i in range(len(input_str) // 2):
         char1 = input_str[2*i]
         char2 = input_str[2*i + 1]
-        output_tryte_string.append(signed_value_to_tryte(128*ord(char1) + ord(char2) - 9841))
+        output_trytes.append(128*ord(char1) + ord(char2) - 9841)
+    
+    print("Output trytes!")
+    print(output_trytes)
     
     # generate list of instructions for printing this string
     offset = 0
     # PUSH D - store whatever is in D before this macro was called
-    output_instr_list += ["baA"]
-    for tryte in output_tryte_string:
+    output_instr_list += PUSH(["PUSH", "D", 8])
+    for tryte in output_trytes:
         # SET D2, n
-        output_instr_list += ["KbD", tryte]
+        output_instr_list += SET(["SET", "D2", tryte, 8])
         # WRITE D2, $add1+offset
-        output_instr_list += ["aDD", unsigned_value_to_tryte(add1_value + offset)]
+        output_instr_list += WRITE(["WRITE", "D2", "$" + str(add1_value + offset), 8])
         offset += 1
     # POP D - recover original state of D
-    output_instr_list += ["bbA"]
+    output_instr_list += POP(["POP", "D", 8])
 
     return output_instr_list
 
@@ -1020,7 +1023,7 @@ def STRPNT(statement):
     input_str = statement[1]
 
     # pad input_str with zeroes
-    output_tryte_string = []
+    output_trytes = []
     if (len(input_str) % 2 == 1):
         # if input_str has odd length, pad it with zero
         new_input_str = input_str + '\0'
@@ -1033,24 +1036,24 @@ def STRPNT(statement):
     for i in range(len(input_str) // 2):
         char1 = input_str[2*i]
         char2 = input_str[2*i + 1]
-        output_tryte_string.append(signed_value_to_tryte(128*ord(char1) + ord(char2) - 9841))
+        output_trytes.append(128*ord(char1) + ord(char2) - 9841)
     
     # now one by one send to register D2 and SHOW them to the console
     output_instr_list = []
     # PUSH D - store whatever is in D before this macro was called
-    output_instr_list += ["baA"]
+    output_instr_list += PUSH(["PUSH", "D", 8])
     # DGET D1 - store the current display mode in D1
-    output_instr_list += ["cBC"]
+    output_instr_list += DGET(["DGET", "D1", 27])
     # DSET 3 - set output mode to wide_text
-    output_instr_list += ["cmJ"]
-    for tryte in output_tryte_string:
+    output_instr_list += DSET(["DSET", 3, 0])
+    for tryte in output_trytes:
         # SET D2, n
-        output_instr_list += ["KbD", tryte]
+        output_instr_list += SET(["SET", "D2", tryte, 8])
         # SHOW D2
-        output_instr_list += ["aAD"]
+        output_instr_list += SHOW(["SHOW", "D2", 9])
     # DSET D1 - restore original output mode
-    output_instr_list += ["cAC"]
+    output_instr_list += DSET(["DSET", "D1", 29])
     # POP D - recover original state of D
-    output_instr_list += ["bbA"]
+    output_instr_list += POP(["POP", "D", 37])
     
     return output_instr_list

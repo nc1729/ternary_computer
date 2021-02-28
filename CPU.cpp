@@ -527,13 +527,13 @@ void CPU::decode_and_execute()
 			// Kxy - Tryte register & constant
 			switch (second)
 			{
-				case 'b':
-				    // KbX - SET X, N
-					set_tryte_to_num(*tryte_regs[third]);
-					break;
 				case 'a':
 				    // KaX - ADD X, N
 					add_num_to_tryte(*tryte_regs[third]);
+					break;
+				case 'b':
+				    // KbX - SET X, N
+					set_tryte_to_num(*tryte_regs[third]);
 					break;
 				case 'c':
 					// KcX - CMP X, N
@@ -852,12 +852,12 @@ void CPU::set_display_mode(size_t n)
 }
 void CPU::get_display_mode(Tryte& a)
 {
-	a = _console.get_output_mode();
+	a = _console.get_output_mode() - 13;
 	_i_ptr += 1;
 }
 void CPU::get_display_mode(Trint<3>& a)
 {
-	a = _console.get_output_mode();
+	a = _console.get_output_mode() - 13;
 	_i_ptr += 1;
 }
 void CPU::push_tryte(Tryte& a)
