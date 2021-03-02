@@ -74,5 +74,10 @@ int main(int argc, char** argv)
         
 
     }
-    cpu.run();
+    else
+    {
+        cpu.run();
+    }
+    
+    
 }

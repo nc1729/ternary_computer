@@ -52,7 +52,6 @@ Console& Console::operator<<(Tryte& t)
 			out_string += second_char;
 			std::cout << out_string;
 		}
-		std::cout << out_string;
 	}
 	else if (_output_mode == OutputMode::wide_text)
 	{

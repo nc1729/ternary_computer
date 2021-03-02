@@ -4,5 +4,5 @@ main:
     DIV F0, F1
     STRPNT "F0 = "
     SHOW F0
-    STRPNT "\nAll done!"
+    STRPNT "\nAll done!\n"
 end main
