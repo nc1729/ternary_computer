@@ -22,6 +22,7 @@ CFLAGS = -Wall -Werror -Wextra
 # Project files
 #
 SRCS = Tryte.cpp test.cpp main.cpp CPU.cpp Console.cpp Float.cpp FPU.cpp
+HEADERDIR = ./include
 OBJS = $(SRCS:.cpp=.o)
 EXE = ternary_computer
 
@@ -55,8 +56,8 @@ debug: debug_prep $(DBGEXE)
 $(DBGEXE): $(DBGOBJS)
 	$(CC) $(CFLAGS) $(DBGCFLAGS) -o $(DBGEXE) $^
 
-$(DBGDIR)/%.o: %.cpp
-	$(CC) -c $(CFLAGS) $(DBGCFLAGS) -o $@ $<
+$(DBGDIR)/%.o: src/%.cpp
+	$(CC) -I $(HEADERDIR) -c $(CFLAGS) $(DBGCFLAGS) -o $@ $<
 
 #
 # Release rules
@@ -66,8 +67,8 @@ release: $(RELEXE)
 $(RELEXE): $(RELOBJS)
 	$(CC) $(CFLAGS) $(RELCFLAGS) -o $(RELEXE) $^
 
-$(RELDIR)/%.o: %.cpp
-	$(CC) -c $(CFLAGS) $(RELCFLAGS) -o $@ $<
+$(RELDIR)/%.o: src/%.cpp
+	$(CC) -I $(HEADERDIR) -c $(CFLAGS) $(RELCFLAGS) -o $@ $<
 
 #
 # Other rules
