@@ -1,5 +1,6 @@
 main:
     SET A, 1000000000
+    DSET 2
     SHOW A
     STRPNT "\n"
 end main

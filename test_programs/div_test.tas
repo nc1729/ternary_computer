@@ -1,6 +1,7 @@
 main:
     SET A, -3812798742493
     SET B, 3812798742493
+    DSET 2 # set display mode to number mode
     STRPNT "A = "
     SHOW A
     STRPNT "\n"

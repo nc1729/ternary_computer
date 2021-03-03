@@ -134,6 +134,8 @@ class Tryte
     static Tryte abs(Tryte const& t);
     // get the sign of a Tryte
     static int64_t sign(Tryte const& t);
+    // get the length of a Tryte (9 - number of leading zeroes)
+    static size_t length(Tryte const& t);
     // divide two Trytes and store the quotient and remainder
     static std::array<Tryte, 2> div(Tryte& t1, Tryte& t2);
 };

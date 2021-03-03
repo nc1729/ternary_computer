@@ -1,15 +1,15 @@
 #include "CPU.h"
 #include "Console.h"
+#include "FPU.h"
 #include <vector>
 #include <string>
 #include <array>
 #include <fstream>
-#include <iostream>
 #include <stdexcept>
 
-CPU::CPU(Memory<19683>* memory, std::vector<std::string>& disknames)
+CPU::CPU(Memory<19683>& memory, std::vector<std::string>& disknames)
 {
-	_memory = *memory;
+	_memory = memory;
 	_disknames = disknames;
 	_console = Console();
 	_clock = 0;
@@ -43,7 +43,7 @@ void CPU::fetch()
 	_instr = _memory[_i_ptr];
 }
 
-void CPU::execute()
+void CPU::decode_and_execute()
 {
 	std::string instruction = Tryte::septavingt_string(_instr);
 	char first = instruction[0];
@@ -177,7 +177,7 @@ void CPU::execute()
 				break;
 
 			case 'm':
-				// 0mn - MOUNT n
+				// 0m - MOUNT n
 				mount(low_3 + 13);
 				break;
 
@@ -191,48 +191,23 @@ void CPU::execute()
 			// aXX - input/output
 			switch (second)
 			{
-				case '0':
-					// a0 - PRINT $X, N
-					print();
-					break;
-
 				case 'A':
-					// aAX - SHOW X
-					show_tryte(*tryte_regs[third]);
-					break;
-
-				case 'a':
-					// aaX - SHOW X
-					show_trint(*trint_regs[low_2]);
-					break;
-
-				case 'B':
-					// aBX - TELL X
-					tell_tryte(*tryte_regs[third]);
-					break;
-
-				case 'b':
-					// abX - SHOW X
-					tell_trint(*trint_regs[low_2]);
-					break;
-
-				case 'C':
-					// aCY - READ $X, Y
+					// aAY - READ $X, Y
 					read_tryte(*tryte_regs[third]);
 					break;
 
-				case 'c':
-					// acY - READ $X, Y
+				case 'a':
+					// aaY - READ $X, Y
 					read_trint(*trint_regs[low_2]);
 					break;
 
-				case 'D':
-					// aDX - WRITE X, $Y
+				case 'B':
+					// aBX - WRITE X, $Y
 					write_tryte(*tryte_regs[third]);
 					break;
 
-				case 'd':
-					// adX - WRITE X, $Y
+				case 'b':
+					// abX - WRITE X, $Y
 					write_trint(*trint_regs[low_2]);
 					break;
 
@@ -254,7 +229,6 @@ void CPU::execute()
 				default:
 					halt_and_catch_fire();
 					break;
-
 			}
 			break;
 
@@ -302,6 +276,53 @@ void CPU::execute()
 					break;
 			}
 			break;
+		
+		case 'c':
+			// cXX - console management
+			switch (second)
+			{
+				case '0':
+					// c0 - PRINT $X, n
+					print();
+					break;
+				case 'a':
+					// caX - DSET X
+					set_display_mode(*trint_regs[low_2]);
+					break;
+				case 'A':
+					// cAX - DSET X
+					set_display_mode(*tryte_regs[third]);
+					break;
+				case 'b':
+					// cbX - DGET X
+					get_display_mode(*trint_regs[low_2]);
+					break;
+				case 'B':
+					// cBX - DGET X
+					get_display_mode(*tryte_regs[third]);
+					break;
+				case 'c':
+					// ccX - SHOW X
+					show_trint(*trint_regs[low_2]);
+					break;
+				case 'C':
+					// cCX - SHOW X
+					show_tryte(*tryte_regs[third]);
+					break;
+				case 'd':
+					// cdX - TELL X
+					tell_trint(*trint_regs[low_2]);
+					break;
+				case 'D':
+					// cDX - TELL X
+					tell_tryte(*tryte_regs[third]);
+					break;
+				case 'm':
+					// cmn - DSET n
+					set_display_mode(low_3 + 13);
+					break; 
+			}
+			break; 
 
 		case 'A':
 			// AXY - add trytes
@@ -335,6 +356,22 @@ void CPU::execute()
 
 		case 'f':
 			// fXY - floating point operations
+			// pass instruction to FPU - FPU will decode and execute the instruction
+			_FPU.handle_instr(instruction);
+			if (_FPU.error)
+			{
+				halt_and_catch_fire();
+			}
+			break;
+		
+		case 'g':
+			// gXY - floating point operations
+			// pass instruction to FPU - FPU will decode and execute the instruction
+			_FPU.handle_instr(instruction);
+			if (_FPU.error)
+			{
+				halt_and_catch_fire();
+			}
 			break;
 
 		case 'F':
@@ -490,13 +527,13 @@ void CPU::execute()
 			// Kxy - Tryte register & constant
 			switch (second)
 			{
-				case 'b':
-				    // KbX - SET X, N
-					set_tryte_to_num(*tryte_regs[third]);
-					break;
 				case 'a':
 				    // KaX - ADD X, N
 					add_num_to_tryte(*tryte_regs[third]);
+					break;
+				case 'b':
+				    // KbX - SET X, N
+					set_tryte_to_num(*tryte_regs[third]);
 					break;
 				case 'c':
 					// KcX - CMP X, N
@@ -590,10 +627,10 @@ void CPU::write_tryte(Tryte& x)
 }
 void CPU::write_trint(Trint<3>& x)
 {
-	Tryte& add_y = _memory[_i_ptr + 1];
-	_memory[add_y] = x[0];
-	_memory[add_y + 1] = x[1];
-	_memory[add_y + 2] = x[2];
+	Tryte& add_x = _memory[_i_ptr + 1];
+	_memory[add_x] = x[0];
+	_memory[add_x + 1] = x[1];
+	_memory[add_x + 2] = x[2];
 	_i_ptr += 2;
 }
 void CPU::load()
@@ -724,6 +761,103 @@ void CPU::mount(size_t n)
 	{
 		throw std::runtime_error("Tried to mount a disk that doesn't exist.\n");
 	}
+	_i_ptr += 1;
+}
+void CPU::set_display_mode(Tryte& a)
+{
+	std::array<int16_t, 3> a_array = Tryte::septavingt_array(a);
+	int16_t last_digit = a_array[2] + 13;
+	switch (last_digit)
+	{
+		case 0:
+			_console.raw_mode();
+			break;
+		case 1:
+			_console.ternary_mode();
+			break;
+		case 2:
+			_console.number_mode();
+			break;
+		case 3:
+			_console.dense_text_mode();
+			break;
+		case 4:
+			_console.wide_text_mode();
+			break;
+		case 5:
+			_console.graphics_mode();
+			break;
+		default:
+			throw std::runtime_error("Unrecognised display mode.\n");
+			break;
+	}
+	_i_ptr += 2;
+}
+void CPU::set_display_mode(Trint<3>& a)
+{
+	int16_t last_digit = Tryte::septavingt_array(a[2])[2] + 13;
+	switch (last_digit)
+	{
+		case 0:
+			_console.raw_mode();
+			break;
+		case 1:
+			_console.ternary_mode();
+			break;
+		case 2:
+			_console.number_mode();
+			break;
+		case 3:
+			_console.dense_text_mode();
+			break;
+		case 4:
+			_console.wide_text_mode();
+			break;
+		case 5:
+			_console.graphics_mode();
+			break;
+		default:
+			throw std::runtime_error("Unrecognised display mode.\n");
+			break;
+	}
+	_i_ptr += 2;
+}
+void CPU::set_display_mode(size_t n)
+{
+	switch (n)
+	{
+		case 0:
+			_console.raw_mode();
+			break;
+		case 1:
+			_console.ternary_mode();
+			break;
+		case 2:
+			_console.number_mode();
+			break;
+		case 3:
+			_console.dense_text_mode();
+			break;
+		case 4:
+			_console.wide_text_mode();
+			break;
+		case 5:
+			_console.graphics_mode();
+			break;
+		default:
+			throw std::runtime_error("Unrecognised display mode.\n");
+			break;
+	}
+	_i_ptr += 1;
+}
+void CPU::get_display_mode(Tryte& a)
+{
+	a = _console.get_output_mode() - 13;
+	_i_ptr += 1;
+}
+void CPU::get_display_mode(Trint<3>& a)
+{
+	a = _console.get_output_mode() - 13;
 	_i_ptr += 1;
 }
 void CPU::push_tryte(Tryte& a)
@@ -1318,15 +1452,19 @@ void CPU::run()
 	while (_on)
 	{
 		fetch();
-		execute();
+		decode_and_execute();
 		_clock += 1;
 	}
 }
 void CPU::step()
 {
 	fetch();
-	execute();
+	decode_and_execute();
 	_clock += 1;
+}
+void CPU::switch_off()
+{
+	_on = false;
 }
 bool CPU::is_on()
 {
@@ -1334,29 +1472,21 @@ bool CPU::is_on()
 }
 void CPU::dump()
 {
-	std::cout << "This instruction: " << _instr << '\n';
-	std::cout << "Registers:\n";
-	std::cout << "\na = ";
-	_console << _a;
-	std::cout << "\nb = ";
-	_console << _b;
-	std::cout << "\nc = ";
-	_console << _c;
-	std::cout << "\nd = ";
-	_console << _d;
-	std::cout << "\ne = ";
-	_console << _e;
-	std::cout << "\ng = ";
-	_console << _g;
-	std::cout << "\nh = ";
-	_console << _h;
-	std::cout << "\ni = ";
-	_console << _i;
-	std::cout << "\nj = ";
-	_console << _j;
-	std::cout << "\ni_ptr = " << _i_ptr << '\n';
-	std::cout << "\ns_ptr = " << _s_ptr << '\n';
-	std::cout << "Flags: " << _flags << '\n';
+	_console.raw_mode();
+	_console << "Next instruction: " << _memory[_i_ptr] << '\n';
+	_console << "Integer registers:\n";
+	_console.number_mode();
+	_console << "a = " << _a << " b = " << _b << " c = " << _c << '\n';
+	_console << "d = " << _d << " e = " << _e << " g = " << _g << '\n';
+	_console << "h = " << _h << " i = " << _i << " j = " << _j << '\n';
+	_console.raw_mode();
+	_console << "i_ptr = " << _i_ptr << '\n';
+	_console << "s_ptr = " << _s_ptr << '\n';
+	_console.ternary_mode();
+	_console << "Flags: " << _flags << '\n';
+	_FPU.dump();
+	_console << '\n';
+	_console.raw_mode();
 }
 void CPU::set_interrupt_priority(int16_t n)
 {

@@ -49,6 +49,8 @@ def assemble_instr(statement):
         "PRINT": handle_instr.PRINT,
         "SHOW": handle_instr.SHOW,
         "TELL": handle_instr.TELL,
+        "DSET": handle_instr.DSET,
+        "DGET": handle_instr.DGET,
         "PEEK": handle_instr.PEEK,
         "FILL": handle_instr.FILL,
         "MOUNT": handle_instr.MOUNT,

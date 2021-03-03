@@ -34,15 +34,19 @@ I don't know so much about this, but you can extend boolean logic to balanced te
 
 ## Progress so far
 - Trytes and Trints (three Trytes stuck together, forming an 27-trit integer with values in the range -(3^27 - 1)/2 <= n <= (3^27 - 1)/2.) implemented with most operations defined.
-- CPU class written with 27 Tryte registers (which can be operated in groups of three as Trints) and operations defined on them
+- TFloats implemented - representations of decimal numbers using ternary arithmetic.
+- CPU class written with 27 Tryte registers (which can be operated in groups of three as Trints) and operations defined on them. FPU also implemented, which contains its own 9 TFloat registers.
 - Memory implemented- fixed at 3^9 = 19,683 Trytes now. Addresses run from $MMM-$mmm
 - In lieu of an actual file system, disk filenames can be set as command line arguments. Up to 27 disks can be used at one time, with up to 19,683 Trytes of addressable disk space on each.
-- An assembler (not quite finished) written in Python, converting more human readable instructions to ternary machine code.
+- An assembler written in Python, converting more human readable instructions to ternary machine code.
 
 ## To do
+- Rearrange repo structure to be a little more standard (add /src, /include, /doc, /bin folders and ensure everything builds correctly)
+- Create test framework to verify operations on Trytes, Trints and TFloats are working correctly
 - Add documentation for ternary assembly language
-- Test by writing more programs
-- Write a simple shell? Support larger disks? Upgrade console to understand ANSI colour codes?
+- Implement graphics mode for console (so console outputs ANSI colour codes from certain Trytes)
+- Define a disk 'standard', with a set header format that the computer can understand
+- Create a barebones OS, that prompts the user to select/copy disks; similar in sense to BIOS menus on GameCube/PS2
 
 ## How to run
 Pull the repository, run 'make'. Executable will be written to ./build/release. Run 'make debug' to turn debug flags on.
