@@ -45,7 +45,7 @@ RELCFLAGS = -O2 -DNDEBUG
 #
 # Test executable build settings
 #
-TESTDIR = test/build
+TESTDIR = build/test
 TESTEXE = $(TESTDIR)/test
 TESTCFLAGS = -g -DDEBUG
 
@@ -80,7 +80,7 @@ $(RELDIR)/%.o: src/%.cpp src/main.cpp
 #
 # Test rules
 #
-test: debug_prep $(DBGOBJS) $(TESTEXE)
+test: debug_prep test_prep $(DBGOBJS) $(TESTEXE)
 
 $(DBGDIR)/%.o: src/%.cpp src/main.cpp
 	$(CC) -I $(HEADERDIR) -c $(CFLAGS) $(DBGCFLAGS) -o $@ $<
@@ -88,8 +88,8 @@ $(DBGDIR)/%.o: src/%.cpp src/main.cpp
 $(TESTEXE): $(DBGOBJS) $(TESTDIR)/test.o
 	$(CC) $(CFLAGS) $(TESTCFLAGS) -o $(TESTEXE) $^
 
-$(TESTDIR)/test.o:
-	$(CC) -I $(HEADERDIR) -c $(CFLAGS) $(TESTCFLAGS) -o $@ test/test.cpp
+$(TESTDIR)/%.o: test/test.cpp
+	$(CC) -I $(HEADERDIR) -c $(CFLAGS) $(TESTCFLAGS) -o $@ $<
 	
 #
 # Other rules
@@ -109,4 +109,4 @@ prep:
 remake: clean all
 
 clean:
-	rm -f $(RELEXE) $(RELOBJS) $(DBGEXE) $(DBGOBJS) $(TESTEXE)
+	rm -f $(RELEXE) $(RELOBJS) $(DBGEXE) $(DBGOBJS) $(TESTEXE) build/test/test.o

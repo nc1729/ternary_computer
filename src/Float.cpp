@@ -52,6 +52,7 @@ TFloat::TFloat(double d)
     {
         double power_of_3 = 1.0;
         // calculate current estimate
+        estimate = 0.0;
         for (size_t j = 0; j < i; j++)
         {
             estimate += mantissa_array[j] * (1.0 / power_of_3);
@@ -86,10 +87,11 @@ TFloat::TFloat(double d)
     int64_t power_of_3 = 1;
     for (size_t i = 0; i < 18; i++)
     {
-        mantissa_int = mantissa_array[i] * power_of_3;
+        mantissa_int += mantissa_array[17 - i] * power_of_3;
         power_of_3 *= 3;
     }
     _mantissa = mantissa_int;
+    this->normalise();
 }
 TFloat::TFloat(Trint<1> const& exponent, Trint<2> const& mantissa)
 {
