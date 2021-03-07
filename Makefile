@@ -21,7 +21,7 @@ CFLAGS = -Wall -Werror -Wextra
 #
 # Project files
 #
-SRCS = Tryte.cpp test.cpp main.cpp CPU.cpp Console.cpp Float.cpp FPU.cpp
+SRCS = Tryte.cpp CPU.cpp Console.cpp Float.cpp FPU.cpp
 HEADERDIR = ./include
 OBJS = $(SRCS:.cpp=.o)
 EXE = ternary_computer
@@ -42,8 +42,15 @@ RELEXE = $(RELDIR)/$(EXE)
 RELOBJS = $(addprefix $(RELDIR)/, $(OBJS))
 RELCFLAGS = -O2 -DNDEBUG
 
+#
+# Test executable build settings
+#
+TESTDIR = test/build
+TESTEXE = $(TESTDIR)/test
+TESTCFLAGS = -g -DDEBUG
+
 # Makes Makefile always see these as tasks, rather than potential files
-.PHONY: all clean debug prep debug_prep release_prep release remake
+.PHONY: all clean debug prep test debug_prep release_prep release remake
 
 # Default build
 all: release_prep release
@@ -53,10 +60,10 @@ all: release_prep release
 #
 debug: debug_prep $(DBGEXE)
 
-$(DBGEXE): $(DBGOBJS)
+$(DBGEXE): $(DBGOBJS) $(DBGDIR)/main.o
 	$(CC) $(CFLAGS) $(DBGCFLAGS) -o $(DBGEXE) $^
 
-$(DBGDIR)/%.o: src/%.cpp
+$(DBGDIR)/%.o: src/%.cpp src/main.cpp
 	$(CC) -I $(HEADERDIR) -c $(CFLAGS) $(DBGCFLAGS) -o $@ $<
 
 #
@@ -64,12 +71,26 @@ $(DBGDIR)/%.o: src/%.cpp
 #
 release: $(RELEXE)
 
-$(RELEXE): $(RELOBJS)
+$(RELEXE): $(RELOBJS) $(RELDIR)/main.o
 	$(CC) $(CFLAGS) $(RELCFLAGS) -o $(RELEXE) $^
 
-$(RELDIR)/%.o: src/%.cpp
+$(RELDIR)/%.o: src/%.cpp src/main.cpp
 	$(CC) -I $(HEADERDIR) -c $(CFLAGS) $(RELCFLAGS) -o $@ $<
 
+#
+# Test rules
+#
+test: debug_prep $(DBGOBJS) $(TESTEXE)
+
+$(DBGDIR)/%.o: src/%.cpp src/main.cpp
+	$(CC) -I $(HEADERDIR) -c $(CFLAGS) $(DBGCFLAGS) -o $@ $<
+
+$(TESTEXE): $(DBGOBJS) $(TESTDIR)/test.o
+	$(CC) $(CFLAGS) $(TESTCFLAGS) -o $(TESTEXE) $^
+
+$(TESTDIR)/test.o:
+	$(CC) -I $(HEADERDIR) -c $(CFLAGS) $(TESTCFLAGS) -o $@ test/test.cpp
+	
 #
 # Other rules
 #
@@ -79,10 +100,13 @@ debug_prep:
 release_prep:
 	@mkdir -p $(RELDIR)
 
+test_prep:
+	@mkdir -p $(TESTDIR)
+
 prep:
 	@mkdir -p $(DBGDIR) $(RELDIR)
 
 remake: clean all
 
 clean:
-	rm -f $(RELEXE) $(RELOBJS) $(DBGEXE) $(DBGOBJS)
+	rm -f $(RELEXE) $(RELOBJS) $(DBGEXE) $(DBGOBJS) $(TESTEXE)
