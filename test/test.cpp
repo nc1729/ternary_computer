@@ -6,8 +6,8 @@
 
 void test_float_constructor()
 {
-    TFloat f1 = 0.5;
-    std::string expected = "000eMMMMM";
+    TFloat f1 = 244.0;
+    std::string expected = "00eia0000";
     std::stringstream str_stream;
     str_stream << f1;
     std::string found = str_stream.str();

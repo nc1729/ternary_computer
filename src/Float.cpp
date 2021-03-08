@@ -15,7 +15,7 @@ TFloat::TFloat(double d)
     _exponent = 0;
     if (d > 0)
     {
-        while (d > 1.5)
+        while (d >= 1.5)
         {
             d /= 3;
             _exponent++;
@@ -28,7 +28,7 @@ TFloat::TFloat(double d)
     }
     else if (d < 0)
     {
-        while (d < -1.5)
+        while (d <= -1.5)
         {
             d /= 3;
             _exponent++;
@@ -40,9 +40,16 @@ TFloat::TFloat(double d)
         }
     }
 
-    // we now have -3/2 <= d <= -1/2 or 1/2 <= d <= 3/2
+    // we now have -3/2 < d <= -1/2 or 1/2 <= d < 3/2
     // convert d into a normalised mantissa
+    // multiply d by 3^17
+    d *= pow(3, 17);
+    // and round to nearest integer
+    int64_t mantissa_int = round(d);
+    _mantissa = mantissa_int;
+
     // fill mantissa array
+    /*
     std::array<int16_t, 18> mantissa_array;
     mantissa_array.fill(0);
     double estimate = 0.0;
@@ -92,6 +99,7 @@ TFloat::TFloat(double d)
     }
     _mantissa = mantissa_int;
     this->normalise();
+    */
 }
 TFloat::TFloat(Trint<1> const& exponent, Trint<2> const& mantissa)
 {
