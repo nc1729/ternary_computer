@@ -4,12 +4,12 @@
 #include <sstream>
 #include "Float.h"
 
-void test_float_constructor()
+void test_float_constructor(double input_float, std::string expected_output)
 {
-    TFloat f1 = 1/3.0;
-    std::string expected = "00Ai00000";
+    TFloat f = input_float;
+    std::string expected = expected_output;
     std::stringstream str_stream;
-    str_stream << f1;
+    str_stream << f;
     std::string found = str_stream.str();
 
     bool test_result = (expected == found);
@@ -22,11 +22,11 @@ void test_float_constructor()
     assert(test_result);
 
 }
-void test_float_add()
+void test_float_add(double input_float1, double input_float2, double expected_out)
 {
-    TFloat f1 = 1.0;
-    TFloat f2 = 3.0;
-    TFloat f_expected = 4.0;
+    TFloat f1 = input_float1;
+    TFloat f2 = input_float2;
+    TFloat f_expected = expected_out;
     TFloat f_found = f1 + f2;
     bool test_result = (f_expected == f_found); 
     if (not test_result)
@@ -36,40 +36,14 @@ void test_float_add()
         std::cout << "Found: " << f1 + f2 << '\n';
     }
     assert(test_result);
-
-    f1 = 1.0;
-    f2 = -1.0;
-    f_expected = 0.0;
-    f_found = f1 + f2;
-    test_result = (f_expected == f_found); 
-    if (not test_result)
-    {
-        std::cout << __func__ << " failed.\n";
-        std::cout << "Expected: " << f_expected << '\n';
-        std::cout << "Found: " << f1 + f2 << '\n';
-    }
-    assert(test_result);
 }
-void test_float_mult()
+void test_float_mult(double input_float1, double input_float2, double expected_out)
 {
-    TFloat f1 = 1.0;
-    TFloat f2 = 1.0;
-    TFloat f_expected = 1.0;
+    TFloat f1 = input_float1;
+    TFloat f2 = input_float2;
+    TFloat f_expected = expected_out;
     TFloat f_found = f1 * f2;
     bool test_result = (f_expected == f_found); 
-    if (not test_result)
-    {
-        std::cout << __func__ << " failed.\n";
-        std::cout << "Expected: " << f_expected << '\n';
-        std::cout << "Found: " << f1 + f2 << '\n';
-    }
-    assert(test_result);
-    
-    f1 = 9.0;
-    f2 = -6.0;
-    f_expected = -54.0;
-    f_found = f1 + f2;
-    test_result = (f_expected == f_found); 
     if (not test_result)
     {
         std::cout << __func__ << " failed.\n";
@@ -80,7 +54,7 @@ void test_float_mult()
 }
 int main()
 {
-    test_float_constructor();
-    test_float_add();
-    test_float_mult();
+    test_float_constructor(1.0, "000i00000");
+    test_float_add(1.0, 1.0, 2.0);
+    test_float_mult(1.0, 1.0, 1.0);
 }
