@@ -47,59 +47,6 @@ TFloat::TFloat(double d)
     // and round to nearest integer
     int64_t mantissa_int = round(d);
     _mantissa = mantissa_int;
-
-    // fill mantissa array
-    /*
-    std::array<int16_t, 18> mantissa_array;
-    mantissa_array.fill(0);
-    double estimate = 0.0;
-    double estimate_up = 0.0;
-    double estimate_down = 0.0;
-    for (size_t i = 0; i < 18; i++)
-    {
-        double power_of_3 = 1.0;
-        // calculate current estimate
-        estimate = 0.0;
-        for (size_t j = 0; j < i; j++)
-        {
-            estimate += mantissa_array[j] * (1.0 / power_of_3);
-            power_of_3 *= 3.0;
-        }
-
-        // calculate upper and lower bounds
-        estimate_up = estimate + (1.0 / power_of_3);
-        estimate_down = estimate - (1.0 / power_of_3);
-
-        // which one is closest to d?
-        std::array<double, 3> estimate_array = 
-        {std::abs(d - estimate_down), std::abs(d - estimate), std::abs(d - estimate_up)};
-        double min_element = *std::min_element(estimate_array.begin(), estimate_array.end());
-
-        if (min_element == estimate_array[0])
-        {
-            mantissa_array[i] = -1;
-        }
-        else if (min_element == estimate_array[1])
-        {
-            mantissa_array[i] = 0;
-        }
-        else
-        {
-            mantissa_array[i] = 1;
-        }
-    }
-
-    // fill mantissa
-    int64_t mantissa_int = 0;
-    int64_t power_of_3 = 1;
-    for (size_t i = 0; i < 18; i++)
-    {
-        mantissa_int += mantissa_array[17 - i] * power_of_3;
-        power_of_3 *= 3;
-    }
-    _mantissa = mantissa_int;
-    this->normalise();
-    */
 }
 TFloat::TFloat(Trint<1> const& exponent, Trint<2> const& mantissa)
 {
@@ -538,6 +485,9 @@ TFloat TFloat::operator+(TFloat const& other) const
             mantissa_with_carry >>= carry_size;
             // then add the shift to the exponent
             output._exponent[0] += carry_size;
+            // and then construct the new mantissa
+            output._mantissa[0] = mantissa_with_carry[1];
+            output._mantissa[1] = mantissa_with_carry[2];
         }
 
         // normalise output

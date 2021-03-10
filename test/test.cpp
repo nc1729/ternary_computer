@@ -6,8 +6,8 @@
 
 void test_float_constructor()
 {
-    TFloat f1 = 244.0;
-    std::string expected = "00eia0000";
+    TFloat f1 = 1/3.0;
+    std::string expected = "00Ai00000";
     std::stringstream str_stream;
     str_stream << f1;
     std::string found = str_stream.str();
@@ -24,11 +24,52 @@ void test_float_constructor()
 }
 void test_float_add()
 {
-    TFloat f1 = 12.0;
-    TFloat f2 = 233.0;
-    TFloat f_expected = 245.0;
+    TFloat f1 = 1.0;
+    TFloat f2 = 3.0;
+    TFloat f_expected = 4.0;
     TFloat f_found = f1 + f2;
     bool test_result = (f_expected == f_found); 
+    if (not test_result)
+    {
+        std::cout << __func__ << " failed.\n";
+        std::cout << "Expected: " << f_expected << '\n';
+        std::cout << "Found: " << f1 + f2 << '\n';
+    }
+    assert(test_result);
+
+    f1 = 1.0;
+    f2 = -1.0;
+    f_expected = 0.0;
+    f_found = f1 + f2;
+    test_result = (f_expected == f_found); 
+    if (not test_result)
+    {
+        std::cout << __func__ << " failed.\n";
+        std::cout << "Expected: " << f_expected << '\n';
+        std::cout << "Found: " << f1 + f2 << '\n';
+    }
+    assert(test_result);
+}
+void test_float_mult()
+{
+    TFloat f1 = 1.0;
+    TFloat f2 = 1.0;
+    TFloat f_expected = 1.0;
+    TFloat f_found = f1 * f2;
+    bool test_result = (f_expected == f_found); 
+    if (not test_result)
+    {
+        std::cout << __func__ << " failed.\n";
+        std::cout << "Expected: " << f_expected << '\n';
+        std::cout << "Found: " << f1 + f2 << '\n';
+    }
+    assert(test_result);
+    
+    f1 = 9.0;
+    f2 = -6.0;
+    f_expected = -54.0;
+    f_found = f1 + f2;
+    test_result = (f_expected == f_found); 
     if (not test_result)
     {
         std::cout << __func__ << " failed.\n";
@@ -41,4 +82,5 @@ int main()
 {
     test_float_constructor();
     test_float_add();
+    test_float_mult();
 }

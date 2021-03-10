@@ -437,11 +437,12 @@ public:
 
 		// convert trint into a big array
 		std::array<int16_t, 9 * n> big_tern_array = Trint<n>::ternary_array(*this);
+		std::array<int16_t, 9 * n> big_tern_array_copy = big_tern_array;
 
 		// now shift it
 		for (size_t i = k; i < 9 * n; i++)
 		{
-			big_tern_array[i] = big_tern_array[i - k];
+			big_tern_array[i] = big_tern_array_copy[i - k];
 		}
 		for (size_t i = 0; i < k; i++)
 		{
